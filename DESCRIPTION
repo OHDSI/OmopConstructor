@@ -20,6 +20,8 @@ Imports:
     PatientProfiles,
     purrr,
     rlang,
+    snakecase,
+    stringr,
     tidyr
 Depends: 
     R (>= 4.1)
@@ -30,3 +32,4 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://OHDSI.io/OmopConstructor/
 BugReports: https://github.com/OHDSI/OmopConstructor/issues
+LazyData: true

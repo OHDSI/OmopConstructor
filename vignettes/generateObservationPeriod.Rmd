@@ -1,0 +1,179 @@
+---
+title: "Generating the Observation Period Table"
+output: 
+  html_document:
+    pandoc_args: [
+      "--number-offset=1,0"
+      ]
+    number_sections: yes
+    toc: yes
+vignette: >
+  %\VignetteIndexEntry{D-characterisation}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(CDMConnector)
+CDMConnector::requireEunomia()
+```
+
+```{r, warning=FALSE}
+library(dplyr)
+library(DBI)
+library(duckdb)
+library(OmopConstructor)
+library(IncidencePrevalence)
+
+# Connect to Eunomia database
+con <- DBI::dbConnect(duckdb::duckdb(), CDMConnector::eunomiaDir(datasetName = "synthea-covid19-200k"))
+cdm <- CDMConnector::cdmFromCon(
+  con = con, cdmSchema = "main", writeSchema = "main", cdmName = "Eunomia"
+)
+
+codelist <- CodelistGenerator::getDrugIngredientCodes(
+  cdm = cdm,
+  name = c("acetaminophen"),
+  nameStyle = "{concept_name}"
+)
+
+cdm <- DrugUtilisation::generateDrugUtilisationCohortSet(
+  cdm = cdm, conceptSet = codelist, name = "outcome"
+)
+
+cdm 
+```
+
+## First record to end of database
+
+The default settings for `generateObservationPeriod()` is from first record to end of database. This means that each individual has one observation period, that spans from when they first enter the database up to the end of the data. 
+This setting results in the longest observation period. it is not advised to use this in a database where deaths or other exits from the database aren't well recorded. 
+
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = Inf,
+  persistenceWindow = Inf
+)
+
+OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period), 
+                                  plotType = "densityplot",
+                                  variableName = "Duration in days")
+```
+
+## Min to Max Observation Period
+
+Another option is for an observation period to span from the first record to the last record observed for each person. 
+
+This option can cause problems towards the end of the database. 
+
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = Inf,
+  persistenceWindow = 0
+)
+
+OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period), 
+                                  plotType = "densityplot",
+                                  variableName = "Duration in days")
+```
+
+## Under observation during visits only
+
+Another option is to have people only be under observation during primary care or hospital visits. This would result in most people having multiple observation periods, with each period duration being relatively short. 
+
+This is not a good option to use if you want to calculate incidence or prevalence, as it will result in an unreliable denominator.
+
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = 0,
+  persistenceWindow = 0,
+  recordsFrom = c("visit_occurrence")
+)
+
+p <- OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period))
+p$data <- p$data |>
+  dplyr::mutate(observation_period_order = dplyr::if_else(.data$observation_period_ordinal == "all", 0, as.numeric(gsub("\\D", "", .data$observation_period_ordinal))),
+                observation_period_ordinal = factor(
+                  .data$observation_period_ordinal,
+                  levels = .data$observation_period_ordinal[order(observation_period_order)]
+                ))
+
+p
+```
+
+## Censor after 180 days of no records
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = 180,
+  persistenceWindow = 180
+)
+
+p <- OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period))
+p$data <- p$data |>
+  dplyr::mutate(observation_period_order = dplyr::if_else(.data$observation_period_ordinal == "all", 0, as.numeric(gsub("\\D", "", .data$observation_period_ordinal))),
+                observation_period_ordinal = factor(
+                  .data$observation_period_ordinal,
+                  levels = .data$observation_period_ordinal[order(observation_period_order)]
+                ))
+```
+## Censor after 365 days of no records
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = 365,
+  persistenceWindow = 365
+)
+
+p <- OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period))
+p$data <- p$data |>
+  dplyr::mutate(observation_period_order = dplyr::if_else(.data$observation_period_ordinal == "all", 0, as.numeric(gsub("\\D", "", .data$observation_period_ordinal))),
+                observation_period_ordinal = factor(
+                  .data$observation_period_ordinal,
+                  levels = .data$observation_period_ordinal[order(observation_period_order)]
+                ))
+p
+```
+## Censor after 545 days of no records
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = 545,
+  persistenceWindow = 545
+)
+
+p <- OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period))
+p$data <- p$data |>
+  dplyr::mutate(observation_period_order = dplyr::if_else(.data$observation_period_ordinal == "all", 0, as.numeric(gsub("\\D", "", .data$observation_period_ordinal))),
+                observation_period_ordinal = factor(
+                  .data$observation_period_ordinal,
+                  levels = .data$observation_period_ordinal[order(observation_period_order)]
+                ))
+p
+```
+## Paediatric Databases
+
+The function `generateObservationPeriod()` contains an argument called `censorAge`, which allows users to define the age at which a patient is no longer in observation. For example, for paediatric databases you would not expect patients to be under observation once they turn 18.
+
+```{r, default}
+cdm <- generateObservationPeriod(
+  cdm,
+  collapseEra = Inf,
+  persistenceWindow = Inf,
+  censorAge = 18L
+)
+
+OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period))
+OmopSketch::plotObservationPeriod(OmopSketch::summariseObservationPeriod(cdm$observation_period), 
+                                  plotType = "densityplot",
+                                  variableName = "Duration in days")
+
+```

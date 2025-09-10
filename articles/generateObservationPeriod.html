@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">OmopConstructor</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -41,7 +41,7 @@
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/OHDSI/OmopConstructor/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/ohdsi/OmopConstructor/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -58,15 +58,12 @@
       <h1>Generating the Observation Period Table</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/OHDSI/OmopConstructor/blob/main/vignettes/generateObservationPeriod.Rmd" class="external-link"><code>vignettes/generateObservationPeriod.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/ohdsi/OmopConstructor/blob/main/vignettes/generateObservationPeriod.Rmd" class="external-link"><code>vignettes/generateObservationPeriod.Rmd</code></a></small>
       <div class="d-none name"><code>generateObservationPeriod.Rmd</code></div>
     </div>
 
     
     
-<pre><code><span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> `EUNOMIA_DATA_FOLDER` set to: <span style="color: #0000BB;">/tmp/RtmpsylrGV</span>.</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Download completed!</span></span></code></pre>
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
@@ -156,9 +153,9 @@ periods in a synthetic database.</p>
 definition we will see how to built it in a synthetic dataset. For the
 purpose of this example we will use the (<strong>GiBleed</strong>)
 dataset available using <a href="https://ohdsi.github.io/omock/" class="external-link">omock</a>.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.github.io/omock/" class="external-link">omock</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://OHDSI.io/OmopConstructor/" class="external-link">OmopConstructor</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ohdsi.io/OmopConstructor/" class="external-link">OmopConstructor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://OHDSI.github.io/OmopSketch/" class="external-link">OmopSketch</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span>, warn.conflicts <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
@@ -201,7 +198,7 @@ censored that day.</p>
 data extraction we will need to set the <code>collapseEra</code> and
 <code>persistenceWindow</code> to <code>Inf</code> as we want to span
 the observation period till the extraction of data.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="cn">Inf</span>,</span>
@@ -218,14 +215,14 @@ the observation period till the extraction of data.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:33.573426</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:32.786628</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:33.663401</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:32.862676</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:35.475521</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:34.514092</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:35.615721</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:34.655268</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result1a</span>, <span class="va">result1b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -242,7 +239,7 @@ observation period definition can be problematic as observation periods
 change retrospectively in each data extraction and toward the end of
 observation you end up with a more sick population being in
 observation.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="cn">Inf</span>,</span>
@@ -259,14 +256,14 @@ observation.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:41.338522</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:39.857143</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:41.428919</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:39.942081</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:43.140151</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:41.491076</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:43.289971</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:41.615027</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result2a</span>, <span class="va">result2b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -286,7 +283,7 @@ people having multiple observation periods, with each period duration
 being relatively short. This is not a good option to use if you want to
 calculate incidence or prevalence, as it will result in an unreliable
 denominator.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -304,14 +301,14 @@ denominator.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:47.411743</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:45.254752</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:47.519168</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:45.330321</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:48.891993</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:46.555108</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:49.009102</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:46.659151</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result3a</span>, <span class="va">result3b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -324,7 +321,7 @@ denominator.</p>
 <code>collapseEra</code> argument (<code>collapseEra = 180</code>) and
 set <code>persistenceWindow</code> to <code>0</code> as we add any time
 after the records.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">180</span>,</span>
@@ -341,14 +338,14 @@ after the records.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:54.406613</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:51.49395</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:54.513403</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:51.572844</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:25:56.258776</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:53.182265</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:25:56.568747</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:53.301718</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result4a</span>, <span class="va">result4b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -361,7 +358,7 @@ after the records.</p>
 <code>collapseEra</code> argument (<code>collapseEra = 180</code>), this
 time we will set <code>persistenceWindow</code> to <code>180</code> as
 well as we want to add 180 days after any record.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">180</span>,</span>
@@ -378,14 +375,14 @@ well as we want to add 180 days after any record.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:01.817215</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:58.218616</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:01.917328</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:06:58.306367</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:03.675582</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:06:59.943988</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:03.80505</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:07:00.057716</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result5a</span>, <span class="va">result5b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -396,7 +393,7 @@ well as we want to add 180 days after any record.</p>
 </h3>
 <p>In this case we will set both arguments to <code>365</code>
 analogously to the previous definition.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">365</span>,</span>
@@ -413,14 +410,14 @@ analogously to the previous definition.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:08.848772</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:07:04.970721</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:08.943633</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:07:05.0492</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:10.627075</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:07:06.587508</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:10.761842</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:07:06.709026</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result6</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result6a</span>, <span class="va">result6b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -434,7 +431,7 @@ to extraction) but we will set up the <code>censorAge</code> argument to
 18 as we want to simulate a database with pediatric data where we loose
 followup after the patient turns 18 as they are moved to other
 specialised cares.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="cn">Inf</span>,</span>
@@ -451,14 +448,14 @@ specialised cares.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:15.847756</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:07:11.153546</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:15.940548</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:07:11.22878</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 13:26:17.446967</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-10 15:07:12.559219</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 13:26:17.583445</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-10 15:07:12.679793</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result7</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result7a</span>, <span class="va">result7b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -471,10 +468,10 @@ specialised cares.</p>
 <p>We can easily merge the different results into a single result object
 using the <a href="https://darwin-eu.github.io/omopgenerics/reference/bind.summarised_result.html" class="external-link"><code>bind()</code></a>
 function.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result1</span>, <span class="va">result2</span>, <span class="va">result3</span>, <span class="va">result4</span>, <span class="va">result5</span>, <span class="va">result6</span>, <span class="va">result7</span><span class="op">)</span></span></code></pre></div>
 <p>If we compare the overall statistics of the observation period:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://OHDSI.github.io/OmopSketch/reference/tableObservationPeriod.html" class="external-link">tableObservationPeriod</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span></span></code></pre></div>
 <div id="dzieivhkpx" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
 <style>#dzieivhkpx table {
@@ -1107,12 +1104,12 @@ observation period per person by definition. The Collapse 180 (4) and
 Collapse+Persistence180 (5) lead to the same number of observation
 periods but with different durations. We can take a better look to this
 statistics looking at the plots:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://OHDSI.github.io/OmopSketch/reference/plotObservationPeriod.html" class="external-link">plotObservationPeriod</a></span><span class="op">(</span>result <span class="op">=</span> <span class="va">result</span>, </span>
 <span>                      variableName <span class="op">=</span> <span class="st">"Records per person"</span>,</span>
 <span>                      plotType <span class="op">=</span> <span class="st">"densityplot"</span>, </span>
 <span>                      colour <span class="op">=</span> <span class="st">"cdm_name"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
+<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
 <p>As expected for example we can see that using a window of 180 creates
 more observation periods that using the 365 collapse window, this is
 expected, the bigger the window the less observation periods we will
@@ -1120,7 +1117,7 @@ have.</p>
 <p>Now taking a look at the length of the observation periods, to make
 the plot more clear we will renomalise to a maximum of 1 so we can see
 the different densities side by side:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/filterSettings.html" class="external-link">filterSettings</a></span><span class="op">(</span><span class="va">result_type</span> <span class="op">==</span> <span class="st">"summarise_observation_period"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
@@ -1140,7 +1137,7 @@ the different densities side by side:</p>
 <span>    ribbon <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    colour <span class="op">=</span> <span class="st">"cdm_name"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
-<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
+<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-12-1.png" width="700"></p>
 <p>As we can see the Collapse, persistent and Inpatient approaches
 generate short observation periods, in the pediatric approach most of
 the individuals are censored at their 18th birth day and as in
@@ -1151,13 +1148,13 @@ the ‘First to extract’ approach.</p>
 <p>Now we can compare the amount of person-days in observation for each
 one of the observation period definitions, note this would be the
 denominator of an incidence or prevalence study.</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">variable_name</span> <span class="op">==</span> <span class="st">'Number person-days'</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://OHDSI.github.io/OmopSketch/reference/plotInObservation.html" class="external-link">plotInObservation</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cdm_name"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `result_id` is not present in <span style="color: #0000BB;">result</span>.</span></span>
 <span><span class="co">#&gt; `result_id` is not present in <span style="color: #0000BB;">result</span>.</span></span></code></pre></div>
-<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
+<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-13-1.png" width="700"></p>
 <p>In this plot there are some trends worth remarking: - A larger gap
 increases the observation time (green vs yellow) - Adding a persistence
 window increases quite a bit the observable time (red vs green) - Using
@@ -1165,13 +1162,13 @@ the first to last approach lead to less individuals being in observation
 towards the end of the observation window.</p>
 <p>Finally, to show more in depth the findings we can see the evolution
 of the median age of the individuals in observation:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">result</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">variable_name</span> <span class="op">==</span> <span class="st">'Median age in observation'</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://OHDSI.github.io/OmopSketch/reference/plotInObservation.html" class="external-link">plotInObservation</a></span><span class="op">(</span>colour <span class="op">=</span> <span class="st">"cdm_name"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `result_id` is not present in <span style="color: #0000BB;">result</span>.</span></span>
 <span><span class="co">#&gt; `result_id` is not present in <span style="color: #0000BB;">result</span>.</span></span></code></pre></div>
-<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-15-1.png" width="700"></p>
+<p><img src="generateObservationPeriod_files/figure-html/unnamed-chunk-14-1.png" width="700"></p>
 <p>In this case we see that the pediatric population always has a lower
 median age as individuals are censored when they turn 18. Due to
 <strong>GiBleed</strong> nature we do not see other trends that we see

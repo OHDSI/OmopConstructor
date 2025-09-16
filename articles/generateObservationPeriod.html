@@ -110,12 +110,12 @@ of 180 days.</li>
 <li>
 <em>Collapse+Persistence 180</em>: individuals are in observation
 while they have an ongoing record, different records are collapsed using
-a window of 180 days, a persistence window of 180 days is added at the
+a window of 180 days, a persistence window of 179 days is added at the
 end of each observation period.</li>
 <li>
 <em>Collapse+Persistence 365</em>: individuals are in observation
 while they have an ongoing record, different records are collapsed using
-a window of 365 days, a persistence window of 365 days is added at the
+a window of 365 days, a persistence window of 364 days is added at the
 end of each observation period.</li>
 <li>
 <em>Pediatric</em>: one observation period per person from first
@@ -221,14 +221,14 @@ the observation period till the extraction of data.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:37.119275</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:30.401314</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:37.195692</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:30.486699</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:38.868211</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:32.227065</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:38.991881</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:32.360475</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result1a</span>, <span class="va">result1b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -262,14 +262,14 @@ observation.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:45.036124</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:38.54277</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:45.117687</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:38.635681</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:46.697342</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:40.279966</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:46.824463</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:40.430348</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result2a</span>, <span class="va">result2b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -298,6 +298,8 @@ denominator.</p>
 <span>  censorDate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span>,</span>
 <span>  recordsFrom <span class="op">=</span> <span class="st">"visit_occurrence"</span></span>
 <span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> `persistenceWindow` (<span style="color: #0000BB;">0</span>) can not be equal to `collapseEra` (<span style="color: #0000BB;">0</span>) as back to back</span></span>
+<span><span class="co">#&gt;   observation periods are not allowed, setting `collapseEra = <span style="color: #0000BB;">1</span>`.</span></span>
 <span></span>
 <span><span class="co"># summarise the generated observation_period using OmopSketch</span></span>
 <span><span class="va">result3a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://OHDSI.github.io/OmopSketch/reference/summariseObservationPeriod.html" class="external-link">summariseObservationPeriod</a></span><span class="op">(</span>observationPeriod <span class="op">=</span> <span class="va">cdm</span><span class="op">$</span><span class="va">observation_period</span>,</span>
@@ -307,14 +309,14 @@ denominator.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:50.698134</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:44.553654</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:50.786776</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:44.648474</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:52.049615</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:45.977105</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:52.160639</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:46.102804</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result3</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result3a</span>, <span class="va">result3b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -344,14 +346,14 @@ after the records.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:27:59.269256</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:51.56322</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:27:59.352496</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:51.661563</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:00.982187</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:53.35405</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:01.10818</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:53.491444</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result4</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result4a</span>, <span class="va">result4b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -362,13 +364,16 @@ after the records.</p>
 </h3>
 <p>To collapse records separated by 180 days we will use the
 <code>collapseEra</code> argument (<code>collapseEra = 180</code>), this
-time we will set <code>persistenceWindow</code> to <code>180</code> as
-well as we want to add 180 days after any record.</p>
+time we will set <code>persistenceWindow</code> to <code>179</code> as
+we want to add 179 days after any record. Note
+<code>persistenceWindow</code> and <code>collapseEra</code> can not be
+the same because <em>back to back</em> observation periods are not
+allowed.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">180</span>,</span>
-<span>  persistenceWindow <span class="op">=</span> <span class="fl">180</span>,</span>
+<span>  persistenceWindow <span class="op">=</span> <span class="fl">179</span>,</span>
 <span>  censorAge <span class="op">=</span> <span class="fl">120</span>,</span>
 <span>  censorDate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -381,14 +386,14 @@ well as we want to add 180 days after any record.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:08.220644</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:33:58.963853</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:08.30517</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:33:59.05184</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:09.93629</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:34:00.742434</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:10.054196</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:34:00.859197</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result5</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result5a</span>, <span class="va">result5b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -397,13 +402,13 @@ well as we want to add 180 days after any record.</p>
 <div class="section level3">
 <h3 id="collapsepersistence-365">Collapse+Persistence 365<a class="anchor" aria-label="anchor" href="#collapsepersistence-365"></a>
 </h3>
-<p>In this case we will set both arguments to <code>365</code>
-analogously to the previous definition.</p>
+<p>In this case we will set arguments to <code>365</code> and
+<code>364</code> analogously to the previous definition.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span></span>
 <span>  cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
 <span>  collapseEra <span class="op">=</span> <span class="fl">365</span>,</span>
-<span>  persistenceWindow <span class="op">=</span> <span class="fl">365</span>,</span>
+<span>  persistenceWindow <span class="op">=</span> <span class="fl">364</span>,</span>
 <span>  censorAge <span class="op">=</span> <span class="fl">120</span>,</span>
 <span>  censorDate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2020-01-01"</span><span class="op">)</span></span>
 <span><span class="op">)</span></span>
@@ -416,14 +421,14 @@ analogously to the previous definition.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:16.935351</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:34:06.06255</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:17.013696</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:34:06.1505</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:18.605258</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:34:07.779278</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:18.720288</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:34:07.910693</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result6</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result6a</span>, <span class="va">result6b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -454,14 +459,14 @@ specialised cares.</p>
 <span>                                   output <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"person-days"</span>, <span class="st">"age"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:23.804049</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:34:12.997869</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:23.880983</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:34:13.081482</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The following estimates will be computed:</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> age: median</span></span>
-<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 11:28:25.236198</span></span>
+<span><span class="co">#&gt; → Start summary of data, at 2025-09-16 12:34:14.493859</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 11:28:25.340949</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Summary finished, at 2025-09-16 12:34:14.60321</span></span>
 <span></span>
 <span><span class="co"># change cdm_name to identify the different results objects</span></span>
 <span><span class="va">result7</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://darwin-eu.github.io/omopgenerics/reference/bind.html" class="external-link">bind</a></span><span class="op">(</span><span class="va">result7a</span>, <span class="va">result7b</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -1039,9 +1044,9 @@ function.</p>
 <td headers="[header_name]CDM name
 [header_level]Collapse 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">104.65 (528.84)</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">284.65 (528.84)</td>
+[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">283.65 (528.84)</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">580.48 (660.15)</td>
+[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">579.50 (660.15)</td>
 <td headers="[header_name]CDM name
 [header_level]Pediatric" class="gt_row gt_left" style="text-align: right;">6,343.11 (333.83)</td>
 </tr>
@@ -1058,9 +1063,9 @@ function.</p>
 <td headers="[header_name]CDM name
 [header_level]Collapse 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">15 [8 - 71]</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">195 [188 - 251]</td>
+[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">194 [187 - 250]</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">387 [373 - 623]</td>
+[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">386 [372 - 622]</td>
 <td headers="[header_name]CDM name
 [header_level]Pediatric" class="gt_row gt_left" style="text-align: right;">6,476 [6,364 - 6,477]</td>
 </tr>
@@ -1077,9 +1082,9 @@ function.</p>
 <td headers="[header_name]CDM name
 [header_level]Collapse 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">851.46 (714.96)</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">671.46 (714.96)</td>
+[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">672.46 (714.96)</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">671.74 (728.62)</td>
+[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">672.74 (728.62)</td>
 <td headers="[header_name]CDM name
 [header_level]Pediatric" class="gt_row gt_left" style="text-align: right;">-</td>
 </tr>
@@ -1096,9 +1101,9 @@ function.</p>
 <td headers="[header_name]CDM name
 [header_level]Collapse 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">623 [371 - 1,099]</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">443 [191 - 919]</td>
+[header_level]Collapse+Persistence 180" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">444 [192 - 920]</td>
 <td headers="[header_name]CDM name
-[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">427 [159 - 945]</td>
+[header_level]Collapse+Persistence 365" class="gt_row gt_left" style="text-align: right; border-left-width: 1px; border-left-style: solid; border-left-color: #D3D3D3; border-right-width: 1px; border-right-style: solid; border-right-color: #D3D3D3; border-top-width: 1px; border-top-style: solid; border-top-color: #D3D3D3; border-bottom-width: 1px; border-bottom-style: solid; border-bottom-color: #D3D3D3;">428 [160 - 946]</td>
 <td headers="[header_name]CDM name
 [header_level]Pediatric" class="gt_row gt_left" style="text-align: right;">-</td>
 </tr>

@@ -121,6 +121,15 @@
 <p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
 </div>
 </div>
+<div class="section level2">
+<h2 id="running">Running<a class="anchor" aria-label="anchor" href="#running"></a>
+</h2>
+<p>Configure a <code>.env</code> configuration file using the <code>example.env</code> example settings file. Supply your JDBC driver and place it in the <code>drivers</code> directory.</p>
+<pre><code>docker build . -t omop-constructor
+
+docker run --rm --env-file=".env" --network="host" omop-constructor</code></pre>
+<p>After successful execution the <code>observation_period</code> will have been truncated and recalculated.</p>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>

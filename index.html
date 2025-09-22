@@ -35,7 +35,7 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/generateObservationPeriod.html">Generating the Observation Period Table</a></li>
+<li><a class="dropdown-item" href="articles/buildObservationPeriod.html">Generating the Observation Period Table</a></li>
   </ul>
 </li>
       </ul>
@@ -79,7 +79,7 @@
 <p>Currently <strong>OmopConstructor</strong> main functionalities are:</p>
 <ul>
 <li>
-<a href="https://ohdsi.github.io/OmopConstructor/reference/generateObservationPeriod.html" class="external-link"><code>generateObservationPeriod()</code></a> to generate observation periods based on the data already in the <code>cdm</code> object.</li>
+<a href="https://ohdsi.github.io/OmopConstructor/reference/buildObservationPeriod.html" class="external-link"><code>buildObservationPeriod()</code></a> to generate observation periods based on the data already in the <code>cdm</code> object.</li>
 </ul>
 <div class="section level3">
 <h3 id="building-observation-periods">Building observation periods<a class="anchor" aria-label="anchor" href="#building-observation-periods"></a>
@@ -92,12 +92,14 @@
 <span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://ohdsi.github.io/omock/reference/mockCdmFromDataset.html" class="external-link">mockCdmFromDataset</a></span><span class="op">(</span>datasetName <span class="op">=</span> <span class="st">"GiBleed"</span>, source <span class="op">=</span> <span class="st">"duckdb"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; ℹ Reading GiBleed tables.</span></span>
 <span><span class="co">#&gt; ℹ Adding drug_strength table.</span></span>
+<span><span class="co">#&gt; ℹ Creating local &lt;cdm_reference&gt; object.</span></span>
+<span><span class="co">#&gt; ℹ Inserting &lt;cdm_reference&gt; into duckdb.</span></span>
 <span></span>
-<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generateObservationPeriod.html">generateObservationPeriod</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
-<span>                                 collapseDays <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>                                 persistenceDays <span class="op">=</span> <span class="cn">Inf</span>, </span>
-<span>                                 censorDate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2010-01-01"</span><span class="op">)</span>, </span>
-<span>                                 censorAge <span class="op">=</span> <span class="fl">120</span><span class="op">)</span></span>
+<span><span class="va">cdm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/buildObservationPeriod.html">buildObservationPeriod</a></span><span class="op">(</span>cdm <span class="op">=</span> <span class="va">cdm</span>,</span>
+<span>                              collapseDays <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>                              persistenceDays <span class="op">=</span> <span class="cn">Inf</span>, </span>
+<span>                              censorDate <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="st">"2010-01-01"</span><span class="op">)</span>, </span>
+<span>                              censorAge <span class="op">=</span> <span class="fl">120</span><span class="op">)</span></span>
 <span><span class="va">cdm</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────</span></span>
@@ -125,9 +127,9 @@
 <h2 id="running">Running<a class="anchor" aria-label="anchor" href="#running"></a>
 </h2>
 <p>Configure a <code>.env</code> configuration file using the <code>example.env</code> example settings file. Supply your JDBC driver and place it in the <code>drivers</code> directory.</p>
-<pre><code>docker build . -t omop-constructor
-
-docker run --rm --env-file=".env" --network="host" omop-constructor</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>docker build . <span class="sc">-</span>t omop<span class="sc">-</span>constructor</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>docker run <span class="sc">--</span>rm <span class="sc">--</span>env<span class="sc">-</span>file<span class="ot">=</span><span class="st">".env"</span> <span class="sc">--</span>network<span class="ot">=</span><span class="st">"host"</span> omop<span class="sc">-</span>constructor</span></code></pre></div>
 <p>After successful execution the <code>observation_period</code> will have been truncated and recalculated.</p>
 </div>
 </div>

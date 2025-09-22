@@ -1,13 +1,13 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://OHDSI.github.io/OmopConstructor/404.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/LICENSE.html</loc></url>
-<url><loc>https://OHDSI.github.io/OmopConstructor/articles/generateObservationPeriod.html</loc></url>
+<url><loc>https://OHDSI.github.io/OmopConstructor/articles/buildObservationPeriod.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/articles/index.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/authors.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/index.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/reference/OmopConstructor-package.html</loc></url>
+<url><loc>https://OHDSI.github.io/OmopConstructor/reference/buildObservationPeriod.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/reference/collapseRecords.html</loc></url>
-<url><loc>https://OHDSI.github.io/OmopConstructor/reference/generateObservationPeriod.html</loc></url>
 <url><loc>https://OHDSI.github.io/OmopConstructor/reference/index.html</loc></url>
 </urlset>
 

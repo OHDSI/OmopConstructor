@@ -34,7 +34,7 @@ collapseRecords <- function(x,
   if (!is.infinite(gap)) {
     gap <- as.integer(gap)
   }
-  name <- omopgenerics::validateNameArgument(name, cdm = cdm, null = TRUE)
+  name <- omopgenerics::validateNameArgument(name, null = TRUE)
 
   extraColumns <- colnames(x) |>
     purrr::keep(\(x) !x %in% c(startDate, endDate, by, toSummarise))

@@ -7,6 +7,8 @@
 #' @param by Columns in `x` that aggregate the records.
 #' @param gap Integer; distance allowed between two consecutive records to be
 #' collapsed.
+#' @param toSummarise Columns in x that we want to be keep, the different
+#' columns will be added up.
 #' @param name Name of the new `cdm_table` created.
 #'
 #' @return The `x` `cdm_table` with the records collapsed.
@@ -17,21 +19,25 @@ collapseRecords <- function(x,
                             endDate,
                             by,
                             gap = 0L,
+                            toSummarise = character(),
                             name = NULL) {
   # input check
   omopgenerics::validateCdmTable(table = x)
   cdm <- omopgenerics::cdmReference(x)
   omopgenerics::validateColumn(column = startDate, x = x)
   omopgenerics::validateColumn(column = endDate, x = x)
-  omopgenerics::assertCharacter(by)
+  omopgenerics::assertCharacter(by, unique = TRUE)
   omopgenerics::assertChoice(by, colnames(x))
+  omopgenerics::assertCharacter(toSummarise, unique = TRUE)
+  omopgenerics::assertChoice(toSummarise, colnames(x))
   omopgenerics::assertNumeric(gap, integerish = TRUE, min = 0, length = 1L)
   if (!is.infinite(gap)) {
     gap <- as.integer(gap)
   }
   name <- omopgenerics::validateNameArgument(name, cdm = cdm, null = TRUE)
+
   extraColumns <- colnames(x) |>
-    purrr::keep(\(x) !x %in% c(startDate, endDate, by))
+    purrr::keep(\(x) !x %in% c(startDate, endDate, by, toSummarise))
   if (length(extraColumns) > 0) {
     cli::cli_inform(c("!" = "Columns {.var {extraColumns}} will be dropped from the cdm_table."))
   }
@@ -62,6 +68,9 @@ collapseRecords <- function(x,
       dplyr::summarise(
         !!startDate := min(.data[[startDate]], na.rm = TRUE),
         !!endDate := max(.data[[endDate]], na.rm = TRUE),
+        dplyr::across(
+          dplyr::all_of(toSummarise), \(x) as.integer(sum(x, na.rm = TRUE))
+        ),
         .groups = "drop"
       ) |>
       dplyr::compute(name = name)
@@ -69,24 +78,27 @@ collapseRecords <- function(x,
   }
 
   # get unique ids
-  id <- omopgenerics::uniqueId(n = 5, exclude = c(by, startDate, endDate))
+  id <- omopgenerics::uniqueId(n = 3, exclude = c(by, startDate, endDate), prefix = "xyz")
   # this is so any name of column can be used in by, startdate or endDate
   # id[1] -> date
   # id[2] -> date_id (-1 start; 1 end)
-  # id[3] -> cum_id (cumulative id, if 0 end of episode if -1 and date_id = -1 start of episode)
-  # id[4] -> name (start or end date)
-  # id[5] -> era_id (number of era)
+  # id[3] -> era_id (number of era)
+
+  # to summarise
+  newCols <- rep(0, length(toSummarise)) |>
+    as.list() |>
+    rlang::set_names(nm = toSummarise)
 
   # start dates
-  sel <- rlang::set_names(c(by, startDate), c(by, id[1]))
+  sel <- rlang::set_names(startDate, id[1])
   start <- x |>
-    dplyr::select(dplyr::all_of(sel)) |>
+    dplyr::select(dplyr::all_of(c(by, sel, toSummarise))) |>
     dplyr::mutate(!!id[2] := -1L)
   # end dates
-  sel <- rlang::set_names(c(by, endDate), c(by, id[1]))
+  sel <- rlang::set_names(endDate, id[1])
   end <- x |>
-    dplyr::select(dplyr::all_of(sel)) |>
-    dplyr::mutate(!!id[2] := 1L)
+    dplyr::select(dplyr::all_of(c(by, sel))) |>
+    dplyr::mutate(!!id[2] := 1L, !!!newCols)
 
   # add gap
   if (gap > 0L) {
@@ -97,24 +109,28 @@ collapseRecords <- function(x,
   # join dates
   x <- start |>
     dplyr::union_all(end) |>
-    dplyr::compute(name = name)
-
-  x <- x |>
+    # group
     dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
+    # arrange by date and date_id
     dplyr::arrange(.data[[id[1]]], .data[[id[2]]]) |>
-    dplyr::mutate(!!id[3] := cumsum(.data[[id[2]]])) |>
-    dplyr::filter(
-      .data[[id[3]]] == 0L | (.data[[id[3]]] == -1L & .data[[id[2]]] == -1L)
-    ) |>
+    # calculate the era_id
     dplyr::mutate(
-      !!id[4] := dplyr::if_else(.data[[id[2]]] == -1L, .env$startDate, .env$endDate),
-      !!id[5] := cumsum(dplyr::if_else(.data[[id[3]]] == -1L, 1L, 0L))
+      !!id[3] := dplyr::if_else(cumsum(.data[[id[2]]]) == -1 & .data[[id[2]]] == -1, -1L, 0L)
     ) |>
-    dplyr::ungroup() |>
-    dplyr::select(dplyr::all_of(c(by, id[5], id[4], id[1]))) |>
-    dplyr::compute(name = name) |>
-    tidyr::pivot_wider(names_from = id[4], values_from = id[1]) |>
-    dplyr::select(dplyr::all_of(c(by, startDate, endDate)))
+    dplyr::arrange(.data[[id[1]]], .data[[id[2]]], .data[[id[3]]]) |>
+    dplyr::mutate(!!id[3] := -cumsum(.data[[id[3]]])) |>
+    # summarise
+    dplyr::group_by(.data[[id[3]]], .add = TRUE) |>
+    dplyr::summarise(
+      !!startDate := min(.data[[id[1]]], na.rm = TRUE),
+      !!endDate := max(.data[[id[1]]], na.rm = TRUE),
+      dplyr::across(
+        dplyr::all_of(toSummarise), \(x) as.integer(sum(x, na.rm = TRUE))
+      ),
+      .groups = "drop"
+    ) |>
+    dplyr::select(dplyr::all_of(c(by, startDate, endDate, toSummarise))) |>
+    dplyr::arrange()
 
   if (gap > 0L) {
     x <- x |>

@@ -7,6 +7,10 @@ reference:
   desc: Build custom observation period tables study-by-study basis using data already present in your `cdm` object.
 - contents:
   - buildObservationPeriod
+- subtitle: Build the drug era table
+  desc: Build the drug era table. You can also customise the drug era table to a desired collapseDays to build eras your own way.
+- contents:
+  - buildDrugEra
 - subtitle: Utility functions
   desc: Block of functions used inside the main functions, that can be useful for other packages.
 - contents:

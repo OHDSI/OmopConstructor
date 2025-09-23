@@ -12,12 +12,7 @@ test_that("test drug_era table", {
     )) |>
     copyCdm()
 
-  cdm$drug_exposure |>
-    PatientProfiles::addConceptName() |>
-    dplyr::collect() |>
-    dplyr::select(drug_exposure_id, person_id, drug_concept_id_name, drug_exposure_start_date, drug_exposure_end_date)
-
-  expect_no_error(cdm <- buildDrugEra(cdm = cdm))
+  expect_no_error(cdm$drug_era <- buildDrugEra(cdm = cdm))
   expect_true("drug_era" %in% names(cdm))
 
   drug_era <- cdm$drug_era |>

@@ -4,7 +4,7 @@
 \alias{buildDrugEra}
 \title{Build the \code{drug_era} table}
 \usage{
-buildDrugEra(cdm, collapseDays = 31L)
+buildDrugEra(cdm, collapseDays = 30L)
 }
 \arguments{
 \item{cdm}{A \code{cdm_reference} object.}

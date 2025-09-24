@@ -23,12 +23,12 @@
 #' }
 #'
 buildDrugEra <- function(cdm,
-                         collapseDays = 31L) {
+                         collapseDays = 30L) {
   # input check
   cdm <- omopgenerics::validateCdmArgument(cdm = cdm)
   omopgenerics::assertNumeric(collapseDays, integerish = TRUE, min = 0, length = 1)
   collapseDays <- as.integer(collapseDays)
-  if (collapseDays != 31L) {
+  if (collapseDays != 30L) {
     cli::cli_inform(c("!" = "Building {.pkg drug_era} with `collapseDays = {collapseDays}`, which is different from the OHDSI recommended collapseDays (30)."))
   }
 
@@ -38,7 +38,7 @@ buildDrugEra <- function(cdm,
     dplyr::inner_join(
       cdm$concept |>
         dplyr::filter(
-          .data$vocabulary_id == "RxNorm" &
+          .data$vocabulary_id %in% c("RxNorm", "RxNorm Extension") &
             .data$concept_class_id == "Ingredient"
         ) |>
         dplyr::select("ingredient_concept_id" = "concept_id") |>

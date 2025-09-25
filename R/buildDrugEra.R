@@ -40,7 +40,7 @@ buildDrugEra <- function(cdm,
         dplyr::filter(
           .data$vocabulary_id %in% c("RxNorm", "RxNorm Extension") &
             .data$concept_class_id == "Ingredient" &
-            !stringr::str_detect(string = .data$concept_name, pattern = "vaccine")
+            !stringr::str_like(string = .data$concept_name, pattern = "%vaccine%")
         ) |>
         dplyr::select("ingredient_concept_id" = "concept_id") |>
         dplyr::inner_join(

@@ -10,19 +10,19 @@ dir.create(path = pathToDriver)
 dbms <- Sys.getenv("DBMS")
 if (dbms %in% c("postgresql", "redshift", "sql server", "oracle", "pdw", "snowflake", "spark", "bigquery", "iris")) {
   downloadJdbcDrivers(dbms = dbms, pathToDriver = pathToDriver)
+  connectionDetails <- createConnectionDetails(
+    dbms = dbms,
+    user = Sys.getenv("DB_USER"),
+    password = Sys.getenv("DB_PASSWORD"),
+    server = Sys.getenv("DB_SERVER"),
+    port = Sys.getenv("DB_PORT"),
+    extraSettings = Sys.getenv("SETTINGS"),
+    pathToDriver = pathToDriver
+  )
+  con <- connect(connectionDetails = connectionDetails)
+} else if (dbms == "duckdb") {
+  con <- duckdb::dbConnect(drv = duckdb::duckdb(dbdir = Sys.getenv("DB_SERVER")))
 }
-
-connectionDetails <- createConnectionDetails(
-  dbms = dbms,
-  user = Sys.getenv("DB_USER"),
-  password = Sys.getenv("DB_PASSWORD"),
-  server = Sys.getenv("DB_SERVER"),
-  port = Sys.getenv("DB_PORT"),
-  extraSettings = Sys.getenv("SETTINGS"),
-  pathToDriver = pathToDriver
-)
-
-con <- connect(connectionDetails = connectionDetails)
 
 cdm <- cdmFromCon(
   con = con,

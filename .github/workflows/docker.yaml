@@ -53,4 +53,11 @@ jobs:
       # check docker was created successfully
       - name: Check R + package load
         run: |
-          docker run --rm --env-file="duckdb.env" --network="host" omop-constructor:ci
+          docker run --rm \
+            -e DB_SERVER=gibleed.duckdb \
+            -e DBMS=duckdb \
+            -e CDM_SCHEMA=cdm \
+            -e RESULTS_SCHEMA=main \
+            -e persistenceDays=180 \
+            -e collapseDays=181 \
+            omop-constructor:ci

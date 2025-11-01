@@ -16,15 +16,13 @@ buildPregnancyEpisodes <- function(cdm) {
     ))
   }
 
-  # temp prefix
-  prefix <- omopgenerics::tmpPrefix()
+  tmpName <- "temp_pregnancy_episodes"
 
-  # get raw events
-  raw <- omopgenerics::uniqueTableName(prefix = prefix)
-  cdm <- rawEvents(cdm = cdm, name = raw)
+  # get starting events
+  cdm <- startingEvents(cdm = cdm, name = tmpName)
 
 }
-rawEvents <- function(cdm, name) {
+startingEvents <- function(cdm, name) {
   # temp prefix
   prefix <- omopgenerics::tmpPrefix()
 
@@ -50,7 +48,7 @@ rawEvents <- function(cdm, name) {
     dplyr::mutate(
       type = "Cond",
       value_as_string = " ",
-      value_as_number = as.integer(NA)
+      value_as_number = NA_real_
     ) |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
@@ -69,7 +67,7 @@ rawEvents <- function(cdm, name) {
     dplyr::mutate(
       type = "Proc",
       value_as_string = " ",
-      value_as_number = as.integer(NA)
+      value_as_number = NA_real_
     ) |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
@@ -150,10 +148,96 @@ rawEvents <- function(cdm, name) {
   }
 
   # subset to raw events
-  cdm[[name]] <- co |>
+  events <- co |>
     dplyr::union_all(po) |>
     dplyr::union_all(ob) |>
     dplyr::union_all(me) |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  # events non drug
+  eventsNonDrug <- events |>
+    # convert gestational weeks to days
+    dplyr::mutate(gest_value = dplyr::case_when(
+      .data$category == "GEST" & !is.na(.data$value_as_number) ~ 7 * .data$value_as_number,
+      .data$category == "GEST" & !is.na(.data$gest_value) ~ 7 * .data$gest_value,
+      .default = NA_real_
+    )) |>
+    dplyr::select("person_id", "category", "gest_value", "start_date") |>
+    # exclude people who have ONLY 1 glucose test
+    dplyr::anti_join(
+      events |>
+        dplyr::filter(.data$category == "DIAB") |>
+        dplyr::group_by(.data$person_id) |>
+        dplyr::filter(dplyr::n() == 1) |>
+        dplyr::select("person_id"),
+      by = "person_id"
+    ) |>
+    # eliminate not plausible events for gestational
+    dplyr::filter(!(.data$category == "GEST" & (is.na(.data$gest_value) | .data$gest_value > 301))) |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  # events drug
+  eventsDrug <- cdm[[nm]] |>
+    dplyr::select(
+      "ancestor_concept_id" = "concept_id",
+      "category",
+      "gest_value"
+    ) |>
+    dplyr::filter(.data$category %in% c("CONTRA", "MTX", "OVULDR")) |>
+    # get descendants
+    dplyr::inner_join(
+      cdm$concept_ancestor |>
+        dplyr::select(
+          "ancestor_concept_id",
+          "concept_id" = "descendant_concept_id"
+        ),
+      by = "ancestor_concept_id"
+    ) |>
+    # get only concept_class_id of interest
+    dplyr::inner_join(
+      cdm$concept |>
+        dplyr::filter(.data$concept_class_id %in% c(
+          "Branded Drug", "Branded Pack", "Clinical Drug", "Clinical Pack",
+          "Ingredient"
+        )) |>
+        dplyr::select("concept_id"),
+      by = "concept_id"
+    ) |>
+    # join with drug exposure
+    dplyr::inner_join(
+      cdm$drug_exposure |>
+        dplyr::select(
+          "person_id",
+          "concept_id" = "drug_concept_id",
+          "start_date" = "drug_exposure_start_date"
+        ),
+      by = "concept_id"
+    ) |>
+    # subset individuals of interest
+    dplyr::inner_join(
+      eventsNonDrug |>
+        dplyr::distinct(.data$person_id),
+      by = "person_id"
+    ) |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix)) |>
+    dplyr::select(!"ancestor_concept_id") |>
+    dplyr::mutate(
+      type = "Drug",
+      value_as_string = " ",
+      value_as_number = NA_real_
+    )
+
+  # join drugs and non drugs
+  cdm[[name]] <- eventsNonDrug |>
+    dplyr::select(
+      "person_id", "category", "event_date" = "start_date", "gest_value"
+    ) |>
+    dplyr::union_all(
+      eventsDrug |>
+        dplyr::select(
+          "person_id", "category", "event_date" = "start_date", "gest_value"
+        )
+    ) |>
     dplyr::compute(name = name)
 
   # delete temp tables

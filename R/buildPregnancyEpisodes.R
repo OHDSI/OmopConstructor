@@ -161,7 +161,7 @@ startingEvents <- function(cdm, name) {
     dplyr::mutate(gest_value = dplyr::case_when(
       .data$category == "GEST" & !is.na(.data$value_as_number) ~ 7 * .data$value_as_number,
       .data$category == "GEST" & !is.na(.data$gest_value) ~ 7 * .data$gest_value,
-      .default = NA_real_
+      .default = as.numeric(NA)
     )) |>
     dplyr::select("person_id", "category", "gest_value", "start_date") |>
     # exclude people who have ONLY 1 glucose test
@@ -169,7 +169,8 @@ startingEvents <- function(cdm, name) {
       events |>
         dplyr::filter(.data$category == "DIAB") |>
         dplyr::group_by(.data$person_id) |>
-        dplyr::filter(dplyr::n() == 1) |>
+        dplyr::summarise(n = dplyr::n()) |>
+        dplyr::filter(.data$n == 1) |>
         dplyr::select("person_id"),
       by = "person_id"
     ) |>

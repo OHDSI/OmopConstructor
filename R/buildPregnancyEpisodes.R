@@ -17,22 +17,49 @@ buildPregnancyEpisodes <- function(cdm) {
     ))
   }
 
-  tmpName <- "temp_pregnancy_episodes"
+  # get names for intermediate tables
+  prefix <- omopgenerics::tmpPrefix()
+  nms <- createNames(prefix = prefix)
+
+  # insert concepts and tables
+  cdm <- insertPregnancyTables(cdm = cdm, nms = nms)
 
   # get starting events
-  cdm <- startingEvents(cdm = cdm, name = tmpName)
+  cdm <- getPregnancyEvents(cdm = cdm, nms = nms)
+
+  # valid outcomes tables
+  vo <- dplyr::tibble(person_id = integer(), event_id = integer())
+  cdm <- omopgenerics::insertTable(cdm = cdm, name = nms$valid_outcomes, table = vo)
+
+  # populate life birth events
+  cdm <- populateLifeBirth(cdm = cdm, nms = nms)
 
 }
-startingEvents <- function(cdm, name) {
+createNames <- function(prefix) {
+  list(
+    gest_est = omopgenerics::uniqueTableName(prefix = prefix),
+    outcome_limit = omopgenerics::uniqueTableName(prefix = prefix),
+    pregnancy_concepts = omopgenerics::uniqueTableName(prefix = prefix),
+    term_durations = omopgenerics::uniqueTableName(prefix = prefix),
+    pregnancy_events = omopgenerics::uniqueTableName(prefix = prefix),
+    valid_outcomes = omopgenerics::uniqueTableName(prefix = prefix)
+  )
+}
+insertPregnancyTables <- function(cdm, nms) {
+  cdm |>
+    omopgenerics::insertTable(name = nms$gest_est, table = gest_est) |>
+    omopgenerics::insertTable(name = nms$outcome_limit, table = outcome_limit) |>
+    omopgenerics::insertTable(name = nms$pregnancy_concepts, table = pregnancy_concepts) |>
+    omopgenerics::insertTable(name = nms$term_durations, table = term_durations)
+}
+getPregnancyEvents <- function(cdm, nms) {
   # temp prefix
   prefix <- omopgenerics::tmpPrefix()
 
-  # insert concepts
-  nm <- omopgenerics::uniqueTableName(prefix = prefix)
-  cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = pregnancy_concepts)
-
   # check concepts with data_value != N/A
-  isNotEmpty <- sum(pregnancy_concepts$data_value != "N/A") > 0
+  naIsEmpty <- cdm[[nms$pregnancy_concepts]] |>
+    dplyr::filter(.data$data_value != "N/A") |>
+    omopgenerics::isTableEmpty()
 
   # subset condition_occurrence
   co <- cdm$condition_occurrence |>
@@ -42,7 +69,7 @@ startingEvents <- function(cdm, name) {
       "start_date" = "condition_start_date"
     ) |>
     dplyr::inner_join(
-      cdm[[nm]] |>
+      cdm[[nms$pregnancy_concepts]] |>
         dplyr::select(!"data_value"),
       by = "concept_id"
     ) |>
@@ -61,7 +88,7 @@ startingEvents <- function(cdm, name) {
       "start_date" = "procedure_date"
     ) |>
     dplyr::inner_join(
-      cdm[[nm]] |>
+      cdm[[nms$pregnancy_concepts]] |>
         dplyr::select(!"data_value"),
       by = "concept_id"
     ) |>
@@ -82,13 +109,13 @@ startingEvents <- function(cdm, name) {
       "value_as_number"
     ) |>
     dplyr::inner_join(
-      cdm[[nm]] |>
+      cdm[[nms$pregnancy_concepts]] |>
         dplyr::select(!"data_value"),
       by = "concept_id"
     ) |>
     dplyr::mutate(type = "Obs") |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
-  if (isNotEmpty) {
+  if (!naIsEmpty) {
     ob <- ob |>
       dplyr::union_all(
         cdm$observation |>
@@ -100,7 +127,7 @@ startingEvents <- function(cdm, name) {
             "value_as_number"
           ) |>
           dplyr::inner_join(
-            cdm[[nm]] |>
+            cdm[[nms$pregnancy_concepts]] |>
               dplyr::filter(.data$data_value != "N/A") |>
               dplyr::rename("value_as_string" = "data_value"),
             by = c("concept_id", "value_as_string")
@@ -120,13 +147,13 @@ startingEvents <- function(cdm, name) {
       "value_as_number"
     ) |>
     dplyr::inner_join(
-      cdm[[nm]] |>
+      cdm[[nms$pregnancy_concepts]] |>
         dplyr::select(!"data_value"),
       by = "concept_id"
     ) |>
     dplyr::mutate(type = "Meas") |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
-  if (isNotEmpty) {
+  if (!naIsEmpty) {
     me <- me |>
       dplyr::union_all(
         cdm$measurement |>
@@ -138,7 +165,7 @@ startingEvents <- function(cdm, name) {
             "value_as_number"
           ) |>
           dplyr::inner_join(
-            cdm[[nm]] |>
+            cdm[[nms$pregnancy_concepts]] |>
               dplyr::filter(.data$data_value != "N/A") |>
               dplyr::rename("value_as_string" = "data_value"),
             by = c("concept_id", "value_as_string")
@@ -179,7 +206,7 @@ startingEvents <- function(cdm, name) {
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
   # events drug
-  eventsDrug <- cdm[[nm]] |>
+  eventsDrug <- cdm[[nms$pregnancy_concepts]] |>
     dplyr::select(
       "ancestor_concept_id" = "concept_id",
       "category",
@@ -230,7 +257,7 @@ startingEvents <- function(cdm, name) {
     )
 
   # join drugs and non drugs
-  cdm[[name]] <- eventsNonDrug |>
+  cdm[[nms$pregnancy_events]] <- eventsNonDrug |>
     dplyr::select(
       "person_id", "category", "event_date" = "start_date", "gest_value"
     ) |>
@@ -240,8 +267,64 @@ startingEvents <- function(cdm, name) {
           "person_id", "category", "event_date" = "start_date", "gest_value"
         )
     ) |>
-    dplyr::compute(name = name)
+    dplyr::group_by(.data$person_id) |>
+    dplyr::arrange(.data$event_date) |>
+    dplyr::mutate(event_id = as.integer(dplyr::row_number())) |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = nms$pregnancy_events)
 
   # delete temp tables
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
+}
+populateLifeBirth <- function(cdm, nms) {
+  prefix <- omopgenerics::tmpPrefix()
+
+  # LB events
+  lbEvent <- cdm[[nms$preg]] |>
+    dplyr::filter(.data$category == "LB") |>
+    dplyr::distinct(.data$person_id)
+
+  categories <- unique(c(outcome_limit$first_preg_category, outcome_limit$outcome_preg_category))
+
+  events <- cdm[[nms$pregnancy_events]] |>
+    dplyr::filter(.data$category %in% .env$categories) |>
+    dplyr::inner_join(lbEvent, by = "person_id") |>
+    dplyr::group_by(
+      .data$person_id, .data$category, .data$event_date, .data$gest_value
+    ) |>
+    dplyr::filter(.data$event_id == min(.data$event_id, na.rm = TRUE)) |>
+    dplyr::select("person_id", "event_id", "category", "event_date", "gest_value") |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  firstOutcomeEvent <- events |>
+    dplyr::filter(.data$category == "LB") |>
+    dplyr::group_by(.data$person_id) |>
+    dplyr::arrange(.data$event_date, .data$event_id) |>
+    dplyr::filter(dplyr::row_number() == 1) |>
+    dplyr::select("person_id", "event_id") |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  while(!omopgenerics::isTableEmpty(table = firstOutcomeEvent)) {
+    # add valid_outcomes
+    cdm[[nms$valid_outcomes]] <- cdm[[nms$valid_outcomes]] |>
+      dplyr::union_all(firstOutcomeEvent) |>
+      dplyr::compute(name = nms$valid_outcomes)
+
+    # deleted events
+
+    # SELECT e.PERSON_ID, e.EVENT_ID
+    # INTO #deletedEvents
+    # FROM #PregnancyEvents e
+    # JOIN #pregnancy_events pe ON e.PERSON_ID = pe.PERSON_ID AND e.EVENT_ID = pe.EVENT_ID
+    # JOIN @resultsDatabaseSchema.FirstOutcomeEvent fo ON fo.PERSON_ID = pe.PERSON_ID
+    # JOIN #pregnancy_events foe ON foe.person_id = fo.person_id AND foe.EVENT_ID = fo.EVENT_ID
+    # JOIN @resultsDatabaseSchema.outcome_limit ol ON ol.FIRST_PREG_CATEGORY = foe.Category AND ol.OUTCOME_PREG_CATEGORY = pe.Category
+    # WHERE
+    # (EXTRACT(DAY FROM (foe.EVENT_DATE::timestamp - pe.EVENT_DATE::timestamp)) + 1) < ol.MIN_DAYS
+    # ;
+
+
+  }
+
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
 }

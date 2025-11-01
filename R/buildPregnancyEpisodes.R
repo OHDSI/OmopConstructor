@@ -49,7 +49,7 @@ startingEvents <- function(cdm, name) {
     dplyr::mutate(
       type = "Cond",
       value_as_string = " ",
-      value_as_number = NA_real_
+      value_as_number = as.numeric(NA)
     ) |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
@@ -68,7 +68,7 @@ startingEvents <- function(cdm, name) {
     dplyr::mutate(
       type = "Proc",
       value_as_string = " ",
-      value_as_number = NA_real_
+      value_as_number = as.numeric(NA)
     ) |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 

@@ -12,7 +12,8 @@ buildPregnancyEpisodes <- function(cdm) {
   if ("pregnancy_episode" %in% names(cdm)) {
     cli::cli_abort(c(
       x = "The table `pregnancy_episode` is already present in the cdm.",
-      i = "If you want to overwrite it please run {.code cdm$pregnancy_episode <- NULL} and try again."
+      i = "If you want to overwrite it please run {.run cdm$pregnancy_episode
+      <- NULL} and try again."
     ))
   }
 

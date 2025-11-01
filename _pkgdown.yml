@@ -7,6 +7,10 @@ reference:
   desc: Build custom observation period tables study-by-study basis using data already present in your `cdm` object.
 - contents:
   - buildObservationPeriod
+- subtitle: Build the pregnancy episodes table
+  desc: Build the pregnancy episodes table using the data already present in your `cdm` object.
+- contents:
+  - buildPregnancyEpisode
 - subtitle: Utility functions
   desc: Block of functions used inside the main functions, that can be useful for other packages.
 - contents:

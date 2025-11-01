@@ -115,7 +115,7 @@ rawEvents <- function(cdm, name) {
   me <- cdm$measurement |>
     dplyr::select(
       "person_id",
-      "concept_id" = "observation_concept_id",
+      "concept_id" = "measurement_concept_id",
       "start_date" = "measurement_date",
       "value_as_string" = "value_source_value",
       "value_as_number"
@@ -130,11 +130,11 @@ rawEvents <- function(cdm, name) {
   if (isNotEmpty) {
     me <- me |>
       dplyr::union_all(
-        cdm$observation |>
+        cdm$measurement |>
           dplyr::select(
             "person_id",
-            "concept_id" = "observation_concept_id",
-            "start_date" = "observation_date",
+            "concept_id" = "measurement_concept_id",
+            "start_date" = "measurement_date",
             "value_as_string" = "value_source_value",
             "value_as_number"
           ) |>

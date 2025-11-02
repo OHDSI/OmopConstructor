@@ -35,7 +35,10 @@ buildPregnancyEpisodes <- function(cdm) {
   cdm <- populateLifeBirth(cdm = cdm, nms = nms)
 
   # populate Still Birth events
-  cdm <- populateStillBirth(cdm = cdm, nms = nms)
+  cdm <- populateStillbirth(cdm = cdm, nms = nms)
+
+  # populate Ectropic events
+  cdm <- populateEctropic(cdm = cdm, nms = nms)
 
 }
 createNames <- function(prefix) {
@@ -368,7 +371,7 @@ populateLifeBirth <- function(cdm, nms) {
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
 }
-populateStillBirth <- function(cdm, nms) {
+populateStillbirth <- function(cdm, nms) {
   prefix <- omopgenerics::tmpPrefix()
 
   # SB events
@@ -433,6 +436,88 @@ populateStillBirth <- function(cdm, nms) {
     #   OR (ABS(EXTRACT(DAY FROM (foe.EVENT_DATE::timestamp - pe.EVENT_DATE::timestamp)) + 1) < o1.MIN_DAYS AND prior = 0)
     # )
 
+  }
+
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
+}
+populateEctropic <- function(cdm, nms) {
+  prefix <- omopgenerics::tmpPrefix()
+
+  # ECT events
+  ectEvent <- cdm[[nms$pregnancy_events]] |>
+    dplyr::filter(.data$category == "ECT") |>
+    dplyr::distinct(.data$person_id)
+
+  categories <- unique(c("AGP", "PCONF", "ECT_SURG1", "ECT_SURG2", "MTX",
+                         outcome_limit$first_preg_category,
+                         outcome_limit$outcome_preg_category))
+
+  # events of interest
+  events <- cdm[[nms$pregnancy_events]] |>
+    dplyr::inner_join(ectEvent, by = "person_id") |>
+    dplyr::filter(.data$category %in% .env$categories) |>
+    dplyr::group_by(
+      .data$person_id, .data$category, .data$event_date, .data$gest_value
+    ) |>
+    dplyr::filter(.data$event_id == min(.data$event_id, na.rm = TRUE)) |>
+    dplyr::select("person_id", "event_id", "category", "event_date", "gest_value") |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  # first outcome
+  firstOutcomeEvent <- events |>
+    dplyr::filter(.data$category == "ECT") |>
+    dplyr::group_by(.data$person_id) |>
+    dplyr::arrange(.data$event_date, .data$event_id) |>
+    dplyr::filter(dplyr::row_number() == 1) |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  while (!omopgenerics::isTableEmpty(table = firstOutcomeEvent)) {
+
+    # ECT has surgery with "ECT_SURG1", "ECT_SURG2", "MTX"
+    firstOutcomeEventSurg1 <- firstOutcomeEvent |>
+      dplyr::select("person_id", "event_id", "event_date") |>
+      dplyr::inner_join(
+        events |>
+          dplyr::filter(.data$category %in% c("ECT_SURG1", "ECT_SURG2", "MTX")) |>
+          dplyr::select("person_id", "episode_end_date_revised" = "event_date"),
+        by = "person_id"
+      ) |>
+      dplyr::mutate(date_difference = clock::date_count_between(
+        start = .data$event_date,
+        end = .data$episode_end_date_revised,
+        precision = "day"
+      )) |>
+      dplyr::filter(.data$date_difference >= 0 & .data$date_difference <= 14) |>
+      dplyr::group_by(.data$person_id, .data$event_id) |>
+      dplyr::arrange(.data$episode_end_date_revised) |>
+      dplyr::filter(dplyr::row_number() == 1) |>
+      dplyr::ungroup() |>
+      dplyr::select(!"event_date") |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+    # ECT has surgery with "ECT_SURG1", "MTX"
+    firstOutcomeEventSurg2 <- firstOutcomeEvent |>
+      dplyr::select("person_id", "event_id", "event_date") |>
+      dplyr::inner_join(
+        events |>
+          dplyr::filter(.data$category %in% c("ECT_SURG1", "MTX")) |>
+          dplyr::select("person_id", "episode_end_date_revised" = "event_date"),
+        by = "person_id"
+      ) |>
+      dplyr::mutate(date_difference = clock::date_count_between(
+        start = .data$event_date,
+        end = .data$episode_end_date_revised,
+        precision = "day"
+      )) |>
+      dplyr::filter(.data$date_difference >= 0 & .data$date_difference <= 14) |>
+      dplyr::group_by(.data$person_id, .data$event_id) |>
+      dplyr::arrange(.data$episode_end_date_revised) |>
+      dplyr::filter(dplyr::row_number() == 1) |>
+      dplyr::ungroup() |>
+      dplyr::select(!"event_date") |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
   }
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))

@@ -5,3 +5,4 @@ docs
 .envinst/doc
 .env
 *.duckdb*
+*.txt

@@ -396,5 +396,44 @@ populateStillBirth <- function(cdm, nms) {
     dplyr::filter(dplyr::row_number() == 1) |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
+  while (!omopgenerics::isTableEmpty(table = firstOutcomeEvent)) {
+    # get events that have a prior AGP or PCONF event in the prior 42 days
+    firstOutcomeEventInv <- firstOutcomeEvent |>
+      dplyr::select("person_id", "event_id", "outcome_date" = "event_date") |>
+      dplyr::inner_join(
+        events |>
+          dplyr::filter(.data$category %in% c("AGP", "PCONF")) |>
+          dplyr::select("person_id", "event_date"),
+        by = "person_id"
+      ) |>
+      dplyr::mutate(days = clock::date_count_between(
+        start = .data$event_date,
+        end = .data$outcome_date,
+        precision = "day"
+      ) + 1) |>
+      dplyr::filter(.data$days > 0 & .data$days <= 42) |>
+      dplyr::distinct(.data$person_id, .data$event_id) |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+    # invalid outcomes
+    # cteInvalidOutcomes AS (
+    #   SELECT
+    #   fo.person_id,
+    #   fo.event_id
+    #   FROM
+    #   #ValidOutcomes e
+    #   JOIN #pregnancy_events pe ON pe.EVENT_ID = e.EVENT_ID AND pe.person_id = e.person_id
+    #   JOIN @resultsDatabaseSchema.FirstOutcomeEvent fo ON fo.PERSON_ID = pe.PERSON_ID
+    #   JOIN #pregnancy_events foe ON foe.EVENT_ID = fo.EVENT_ID AND foe.person_id = fo.person_id
+    #   JOIN ctePriorOutcomes po ON po.event_id = pe.event_id AND po.person_id = pe.person_id
+    #   JOIN @resultsDatabaseSchema.outcome_limit o1 ON o1.FIRST_PREG_CATEGORY = foe.Category AND o1.OUTCOME_PREG_CATEGORY = pe.Category
+    #   JOIN @resultsDatabaseSchema.outcome_limit o2 ON o2.FIRST_PREG_CATEGORY = pe.Category AND o2.OUTCOME_PREG_CATEGORY = foe.Category
+    #   WHERE
+    #   (ABS(EXTRACT(DAY FROM (foe.EVENT_DATE::timestamp - pe.EVENT_DATE::timestamp)) + 1) < o2.MIN_DAYS AND prior = 1)
+    #   OR (ABS(EXTRACT(DAY FROM (foe.EVENT_DATE::timestamp - pe.EVENT_DATE::timestamp)) + 1) < o1.MIN_DAYS AND prior = 0)
+    # )
+
+  }
+
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
 }

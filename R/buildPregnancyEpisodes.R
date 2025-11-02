@@ -280,7 +280,7 @@ populateLifeBirth <- function(cdm, nms) {
   prefix <- omopgenerics::tmpPrefix()
 
   # LB events
-  lbEvent <- cdm[[nms$preg]] |>
+  lbEvent <- cdm[[nms$pregnancy_events]] |>
     dplyr::filter(.data$category == "LB") |>
     dplyr::distinct(.data$person_id)
 
@@ -312,20 +312,20 @@ populateLifeBirth <- function(cdm, nms) {
       ) |>
       dplyr::compute(name = nms$valid_outcomes)
 
-    # deleted events
+    # deleted events that dont satisfy outcome_limit criteria
     toDelete <- events |>
       dplyr::select(
         "person_id",
         "event_id",
-        "event_date",
-        "first_preg_category" = "category"
+        "e_date" = "event_date",
+        "outcome_preg_category" = "category"
       ) |>
       dplyr::inner_join(
         firstOutcomeEvent |>
           dplyr::select(
             "person_id",
-            "outcome_date" = "event_date",
-            "outcome_preg_category" = "category"
+            "foe_date" = "event_date",
+            "first_preg_category" = "category"
           ),
         by = "person_id"
       ) |>
@@ -335,12 +335,31 @@ populateLifeBirth <- function(cdm, nms) {
         by = c("first_preg_category", "outcome_preg_category")
       ) |>
       dplyr::filter(
-        clock::date_count_between(start = .data$event_date, end = .data$outcome_date, precision = "day") + 1 < .data$min_days
+        clock::date_count_between(start = .data$e_date, end = .data$foe_date, precision = "day") + 1 < .data$min_days
       ) |>
       dplyr::select("person_id", "event_id") |>
       dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
+    # delete events
+    events <- events |>
+      dplyr::anti_join(toDelete, by = c("person_id", "event_id")) |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
+    # keep only people with a Life birth event
+    lbEvent <- events |>
+      dplyr::filter(.data$category == "LB") |>
+      dplyr::distinct(.data$person_id)
+    events <- events |>
+      dplyr::inner_join(lbEvent, by = "person_id") |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+    # calculate new first outcome event
+    firstOutcomeEvent <- events |>
+      dplyr::filter(.data$category == "LB") |>
+      dplyr::group_by(.data$person_id) |>
+      dplyr::arrange(.data$event_date, .data$event_id) |>
+      dplyr::filter(dplyr::row_number() == 1) |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
   }
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))

@@ -301,27 +301,44 @@ populateLifeBirth <- function(cdm, nms) {
     dplyr::group_by(.data$person_id) |>
     dplyr::arrange(.data$event_date, .data$event_id) |>
     dplyr::filter(dplyr::row_number() == 1) |>
-    dplyr::select("person_id", "event_id") |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
-  while(!omopgenerics::isTableEmpty(table = firstOutcomeEvent)) {
+  while (!omopgenerics::isTableEmpty(table = firstOutcomeEvent)) {
     # add valid_outcomes
     cdm[[nms$valid_outcomes]] <- cdm[[nms$valid_outcomes]] |>
-      dplyr::union_all(firstOutcomeEvent) |>
+      dplyr::union_all(
+        firstOutcomeEvent |>
+          dplyr::select("person_id", "event_id")
+      ) |>
       dplyr::compute(name = nms$valid_outcomes)
 
     # deleted events
-
-    # SELECT e.PERSON_ID, e.EVENT_ID
-    # INTO #deletedEvents
-    # FROM #PregnancyEvents e
-    # JOIN #pregnancy_events pe ON e.PERSON_ID = pe.PERSON_ID AND e.EVENT_ID = pe.EVENT_ID
-    # JOIN @resultsDatabaseSchema.FirstOutcomeEvent fo ON fo.PERSON_ID = pe.PERSON_ID
-    # JOIN #pregnancy_events foe ON foe.person_id = fo.person_id AND foe.EVENT_ID = fo.EVENT_ID
-    # JOIN @resultsDatabaseSchema.outcome_limit ol ON ol.FIRST_PREG_CATEGORY = foe.Category AND ol.OUTCOME_PREG_CATEGORY = pe.Category
-    # WHERE
-    # (EXTRACT(DAY FROM (foe.EVENT_DATE::timestamp - pe.EVENT_DATE::timestamp)) + 1) < ol.MIN_DAYS
-    # ;
+    toDelete <- events |>
+      dplyr::select(
+        "person_id",
+        "event_id",
+        "event_date",
+        "first_preg_category" = "category"
+      ) |>
+      dplyr::inner_join(
+        firstOutcomeEvent |>
+          dplyr::select(
+            "person_id",
+            "outcome_date" = "event_date",
+            "outcome_preg_category" = "category"
+          ),
+        by = "person_id"
+      ) |>
+      dplyr::inner_join(
+        cdm[[nms$outcome_limit]] |>
+          dplyr::select("first_preg_category", "outcome_preg_category", "min_days"),
+        by = c("first_preg_category", "outcome_preg_category")
+      ) |>
+      dplyr::filter(
+        clock::date_count_between(start = .data$event_date, end = .data$outcome_date, precision = "day") + 1 < .data$min_days
+      ) |>
+      dplyr::select("person_id", "event_id") |>
+      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
 
   }

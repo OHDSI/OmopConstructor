@@ -34,6 +34,9 @@ buildPregnancyEpisodes <- function(cdm) {
   # populate life birth events
   cdm <- populateLifeBirth(cdm = cdm, nms = nms)
 
+  # populate Still Birth events
+  cdm <- populateStillBirth(cdm = cdm, nms = nms)
+
 }
 createNames <- function(prefix) {
   list(
@@ -294,6 +297,7 @@ populateLifeBirth <- function(cdm, nms) {
     ) |>
     dplyr::filter(.data$event_id == min(.data$event_id, na.rm = TRUE)) |>
     dplyr::select("person_id", "event_id", "category", "event_date", "gest_value") |>
+    dplyr::ungroup() |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
   firstOutcomeEvent <- events |>
@@ -361,6 +365,36 @@ populateLifeBirth <- function(cdm, nms) {
       dplyr::filter(dplyr::row_number() == 1) |>
       dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
   }
+
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
+}
+populateStillBirth <- function(cdm, nms) {
+  prefix <- omopgenerics::tmpPrefix()
+
+  # SB events
+  sbEvent <- cdm[[nms$pregnancy_events]] |>
+    dplyr::filter(.data$category == "SB") |>
+    dplyr::distinct(.data$person_id)
+
+  categories <- unique(c("AGP", "PCONF", outcome_limit$first_preg_category, outcome_limit$outcome_preg_category))
+
+  events <- cdm[[nms$pregnancy_events]] |>
+    dplyr::filter(.data$category %in% .env$categories) |>
+    dplyr::inner_join(sbEvent, by = "person_id") |>
+    dplyr::group_by(
+      .data$person_id, .data$category, .data$event_date, .data$gest_value
+    ) |>
+    dplyr::filter(.data$event_id == min(.data$event_id, na.rm = TRUE)) |>
+    dplyr::select("person_id", "event_id", "category", "event_date", "gest_value") |>
+    dplyr::ungroup() |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
+  firstOutcomeEvent <- events |>
+    dplyr::filter(.data$category == "SB") |>
+    dplyr::group_by(.data$person_id) |>
+    dplyr::arrange(.data$event_date, .data$event_id) |>
+    dplyr::filter(dplyr::row_number() == 1) |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
 }

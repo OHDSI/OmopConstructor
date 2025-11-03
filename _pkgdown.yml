@@ -7,6 +7,10 @@ reference:
   desc: Build custom observation period tables study-by-study basis using data already present in your `cdm` object.
 - contents:
   - buildObservationPeriod
+- subtitle: Build the Achilles tables
+  desc: Build achilles tables
+- contents:
+  - buildAchilles
 - subtitle: Utility functions
   desc: Block of functions used inside the main functions, that can be useful for other packages.
 - contents:

@@ -1,0 +1,13 @@
+analysis_id,type,table,operation
+0,update,cdm_source,
+1,count record,person,
+2,count record,person,
+3,count record,person,
+4,count record,person,
+5,count record,person,
+7,count record,person,remove provider provider_id
+8,count record,person,remove location location_id
+9,count record,person,remove care_site care_site_id
+10,count record,person,
+11,count record,person,remove death person_id
+12,count record,person,

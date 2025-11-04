@@ -35,18 +35,7 @@ buildAchilles <- function(cdm,
   }
 
   # append to achilles_analysis
-  name <- omopgenerics::uniqueTableName()
-  cdm <- omopgenerics::insertTable(
-    cdm = cdm,
-    name = name,
-    table = achillesAnalisisDetails |>
-      dplyr::filter(.data$analysis_id %in% .env$achillesId) |>
-      dplyr::select(!c("table", "type"))
-  )
-  cdm[["achilles_analysis"]] <- cdm[["achilles_analysis"]] |>
-    dplyr::union_all(cdm[[name]]) |>
-    dplyr::compute(name = "achilles_analysis")
-  cdm <- omopgenerics::dropSourceTable(cdm = cdm, name = name)
+  cdm <- appendAchillesAnalysis(cdm = cdm, achillesId = achillesId)
 
   return(cdm)
 }
@@ -148,33 +137,72 @@ appendAchillesId <- function(cdm, id) {
   analysis <- achillesAnalisisDetails |>
     dplyr::filter(.data$analysis_id == .env$id)
 
+  # get table
   tableName <- analysis$table
-  by <- groupBy(analysis)
-  mut <- mutateColumns(analysis)
+  x <- cdm[[tableName]]
 
-  fun <- switch(analysis$type,
-                "record_count" = "dplyr::n()",
-                "person_count" = "dplyr::n_distinct(.data$person_id)")
-  q <- paste0("as.integer(", fun, ")") |>
-    rlang::set_names("count_value") |>
-    rlang::parse_exprs()
+  # perform operation
+  x <- operation(x = x, op = analysis$operation)
 
+  # name of the table
   nm <- omopgenerics::uniqueTableName()
-  res <- cdm[[tableName]] |>
-    dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
-    dplyr::summarise(!!!q) |>
-    dplyr::mutate(!!!mut, analysis_id = !!analysis$analysis_id) |>
-    dplyr::compute(name = nm) |>
-    dplyr::mutate(dplyr::across(dplyr::starts_with("stratum"), as.character))
 
-  cdm[["achilles_results"]] <- cdm[["achilles_results"]] |>
+  # perform calculation
+  types <- analysisType(type = analysis$type)
+  if (types[[1]] == "update") {
+    res <- update(cdm = cdm)
+  } else if (types[[1]] == "count") {
+    res <- counts(x = x, by = groupBy(analysis = analysis), count = types[[2]])
+  }
+
+  # compute table
+  nm <- omopgenerics::uniqueTableName()
+  res <- dplyr::compute(x = res, name = nm)
+
+  # prepare res
+  res <- prepareResult(res = res, id = id)
+
+  # add results in the corresponding table
+  name <- ifelse(analysis$distribution != 1, "achilles_results", "achilles_results_dist")
+  cdm[[name]] <- cdm[[name]] |>
     dplyr::union_all(res) |>
-    dplyr::compute(name = "achilles_results")
+    dplyr::compute(name = name)
 
+  # drop table
   omopgenerics::dropSourceTable(cdm = cdm, name = nm)
 
   return(cdm)
+}
+operation <- function(x, op) {
+  if (is.na(op)) {
+    return(x)
+  }
 
+  op <- as.list(stringr::str_split_1(string = op, pattern = " "))
+  cdm <- omopgenerics::cdmReference(table = x)
+
+  if (op[[1]] == "remove") {
+    table <- op[[2]]
+    col <- op[[3]]
+    x <- x |>
+      dplyr::filter(!is.na(.data[[col]])) |>
+      dplyr::anti_join(cdm[[table]], by = col)
+  }
+  x
+}
+analysisType <- function(type) {
+  as.list(stringr::str_split_1(string = type, pattern = " "))
+}
+update <- function(cdm) {
+  cdm$person |>
+    dplyr::ungroup() |>
+    dplyr::tally(name = "count_value") |>
+    dplyr::mutate(
+      count_value = as.integer(.data$count_value),
+      stratum_1 = !!omopgenerics::cdmName(x = cdm),
+      stratum_2 = "1.7.2",
+      stratum_3 = !!as.character(Sys.Date())
+    )
 }
 groupBy <- function(analysis) {
   by <- analysis |>
@@ -185,11 +213,53 @@ groupBy <- function(analysis) {
   names(by) <- stringr::str_remove(names(by), "_name$")
   return(by)
 }
-mutateColumns <- function(analysis) {
-  mut <- analysis |>
-    dplyr::select(dplyr::starts_with("stratum_")) |>
-    as.list() |>
-    purrr::keep(\(x) is.na(x))
-  names(mut) <- stringr::str_remove(names(mut), "_name$")
-  return(mut)
+counts <- function(x, by, count) {
+  fun <- switch(count,
+                "record" = "dplyr::n()",
+                "person" = "dplyr::n_distinct(.data$person_id)")
+  q <- paste0("as.integer(", fun, ")") |>
+    rlang::set_names("count_value") |>
+    rlang::parse_exprs()
+  x |>
+    dplyr::group_by(dplyr::across(dplyr::all_of(by))) |>
+    dplyr::summarise(!!!q)
+}
+prepareResult <- function(res, id) {
+  q <- paste0("stratum_", 1:5) |>
+    rlang::set_names() |>
+    purrr::map_chr(\(x) {
+      if (x %in% colnames(res)) {
+        paste0("as.character(.data$", x, ")")
+      } else {
+        "as.character(NA)"
+      }
+    })
+  q["analysis_id"] <- paste0("as.integer(", id, ")")
+  q <- rlang::parse_exprs(q)
+  res |>
+    dplyr::mutate(!!!q)
+}
+appendAchillesAnalysis <- function(cdm, achillesId) {
+  nm <- omopgenerics::uniqueTableName()
+
+  # insert table
+  cdm <- omopgenerics::insertTable(
+    cdm = cdm,
+    name = nm,
+    table = achillesAnalisisDetails |>
+      dplyr::filter(.data$analysis_id %in% .env$achillesId) |>
+      dplyr::select(
+        "analysis_id", "distribution", "distributed_field", "analysis_name",
+        "stratum_1_name", "stratum_2_name", "stratum_3_name", "stratum_4_name",
+        "stratum_5_name", "is_default", "category"
+      )
+  )
+
+  # join
+  cdm[["achilles_analysis"]] <- cdm[["achilles_analysis"]] |>
+    dplyr::union_all(cdm[[nm]]) |>
+    dplyr::compute(name = "achilles_analysis")
+
+  # remove temp table
+  omopgenerics::dropSourceTable(cdm = cdm, name = nm)
 }

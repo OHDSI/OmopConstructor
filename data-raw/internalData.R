@@ -14,4 +14,11 @@ achillesAnalisisDetails <- readr::read_csv(
   )) |>
   dplyr::relocate("is_minimal", .before = "category")
 
+extraDetails <- readr::read_csv(
+  file = here::here("data-raw", "achilles_analysis_extra_details.csv"),
+  col_types = c(analysis_id = "i", type = "c", table = "c", operation = "c")
+)
+achillesAnalisisDetails <- achillesAnalisisDetails |>
+  dplyr::left_join(extraDetails, by = "analysis_id")
+
 usethis::use_data(achillesAnalisisDetails, overwrite = TRUE, internal = TRUE)

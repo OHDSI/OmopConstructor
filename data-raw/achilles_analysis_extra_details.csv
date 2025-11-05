@@ -91,3 +91,21 @@ analysis_id,type,table,operation
 530,count record,death,observation start yes
 531,proportion person_id,death,observation start no
 532,proportion record,death,observation start no
+600,count person_id,procedure_occurrence,
+601,count record,procedure_occurrence,
+602,count person_id,procedure_occurrence,addDate start month
+603,distribution number_concepts,person,addCount procedure_occurrence procedure_concept_id number_concepts
+604,count person_id,procedure_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+605,count record,procedure_occurrence,
+606,distribution age,procedure_occurrence,addGenderConceptId;addAge
+609,count record,procedure_occurrence,remove person person_id
+610,count record,procedure_occurrence,observation start no
+612,count record,procedure_occurrence,remove provider provider_id
+613,count record,procedure_occurrence,remove visit_occurrence visit_occurrence_id
+620,count record,procedure_occurrence,addDate start month
+624,coocurrent standard_concept,procedure_occurrence,
+625,count record,procedure_occurrence,
+630,count record,procedure_occurrence,observation start yes
+631,proportion person_id,procedure_occurrence,observation start no
+632,proportion record,procedure_occurrence,observation start no
+691,conceptDistribution,procedure_occurrence,

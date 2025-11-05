@@ -168,7 +168,9 @@ appendAchillesId <- function(cdm, id) {
   } else if (types[1] == "proportion") {
     res <- proportion(x = x, count = types[2], den = den)
   } else if (types[1] == "coocurrent") {
-    res <- coocurrent(x = x, col = types[2], nm = nm)
+    res <- coocurrent(x = x, col = types[2])
+  } else if (types[1] == "conceptDistribution") {
+    res <- conceptDistribution(x = x)
   } else {
     cli::cli_abort(c(x = "Not configured analysis"))
   }
@@ -471,11 +473,27 @@ counts <- function(x, by, count) {
     dplyr::summarise(!!!q)
 }
 distribution <- function(x, by, value) {
-  x |>
+  x <- x |>
     dplyr::select(dplyr::all_of(c(by, value = value))) |>
-    dplyr::collect() |>
+    dplyr::collect()
+  n <- as.integer(nrow(x))
+  if (n == 0L) {
+    dplyr::tibble(
+      count_value = .env$n,
+      min_value = NA_integer_,
+      max_value = NA_integer_,
+      avg_value = NA_real_,
+      stdev_value = NA_real_,
+      median_value = NA_real_,
+      p10_value = NA_real_,
+      p25_value = NA_real_,
+      p75_value = NA_real_,
+      p90_value = NA_real_
+    )
+  } else {
     dplyr::summarise(
-      count_value = as.integer(dplyr::n()),
+      x,
+      count_value = .env$n,
       min_value = as.integer(min(.data$value, na.rm = TRUE)),
       max_value = as.integer(max(.data$value, na.rm = TRUE)),
       avg_value = as.numeric(mean(.data$value, na.rm = TRUE)),
@@ -486,6 +504,7 @@ distribution <- function(x, by, value) {
       p75_value = as.numeric(quantile(.data$value, probs = 0.75, na.rm = TRUE)),
       p90_value = as.numeric(quantile(.data$value, probs = 0.90, na.rm = TRUE))
     )
+  }
 }
 proportion <- function(x, count, den) {
   if (den == 0) {
@@ -503,7 +522,7 @@ proportion <- function(x, count, den) {
     stratum_3 = sprintf("%i", den)
   )
 }
-coocurrent <- function(x, col, nm) {
+coocurrent <- function(x, col) {
   tn <- omopgenerics::tableName(table = x)
   col <- omopgenerics::omopColumns(table = tn, field = col)
   date <- omopgenerics::omopColumns(table = tn, field = "start_date")
@@ -532,6 +551,21 @@ coocurrent <- function(x, col, nm) {
     ) |>
     dplyr::arrange() |>
     dplyr::filter(.data$stratum_3 <= 10)
+}
+conceptDistribution <- function(x) {
+  nm <- omopgenerics::tableName(table = x)
+  con <- omopgenerics::omopColumns(table = nm, field = "standard_concept")
+  x |>
+    dplyr::select("person_id", dplyr::all_of(c(stratum_1 = con))) |>
+    dplyr::group_by(.data$person_id, .data$stratum_1) |>
+    dplyr::summarise(stratum_2 = - as.integer(dplyr::n()), .groups = "drop") |>
+    dplyr::group_by(.data$stratum_1, .data$stratum_2) |>
+    dplyr::tally(name = "count_value") |>
+    dplyr::group_by(.data$stratum_1) |>
+    dplyr::arrange(.data$stratum_2) |>
+    dplyr::mutate(count_value = cumsum(.data$count_value)) |>
+    dplyr::ungroup() |>
+    dplyr::mutate(stratum_2 = - .data$stratum_2)
 }
 prepareResult <- function(res, id) {
   q <- paste0("stratum_", 1:5) |>

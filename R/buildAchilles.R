@@ -141,6 +141,15 @@ appendAchillesId <- function(cdm, id) {
   tableName <- analysis$table
   x <- cdm[[tableName]]
 
+  # analysis types
+  types <- analysisType(type = analysis$type)
+
+  # proportion denominator
+  if (types[[1]] == "proportion") {
+    den <- counts(x = x, by = character(), count = types[[2]]) |>
+      dplyr::pull()
+  }
+
   # perform operation
   x <- operation(x = x, op = analysis$operation)
 
@@ -148,7 +157,6 @@ appendAchillesId <- function(cdm, id) {
   nm <- omopgenerics::uniqueTableName()
 
   # perform calculation
-  types <- analysisType(type = analysis$type)
   if (types[[1]] == "update") {
     res <- update(cdm = cdm)
   } else if (types[[1]] == "count") {
@@ -157,6 +165,10 @@ appendAchillesId <- function(cdm, id) {
   } else if (types[[1]] == "distribution") {
     by <- groupBy(analysis = analysis)
     res <- distribution(x = x, by = by, value = types[[2]])
+  } else if (types[[1]] == "proportion") {
+    res <- proportion(x = x, count = types[[2]], den = den)
+  } else {
+    cli::cli_abort(c(x = "Not configured analysis"))
   }
 
   # compute table
@@ -447,6 +459,22 @@ distribution <- function(x, by, value) {
       p75_value = as.numeric(quantile(.data$value, probs = 0.75, na.rm = TRUE)),
       p90_value = as.numeric(quantile(.data$value, probs = 0.90, na.rm = TRUE))
     )
+}
+proportion <- function(x, count, den) {
+  if (den == 0) {
+    prop <- NA_character_
+    num <- 0
+  } else {
+    num <- counts(x = x, by = character(), count = count) |>
+      dplyr::pull()
+    prop <- sprintf("%.f", as.numeric(num) / as.numeric(den))
+  }
+  dplyr::tibble(
+    count_value = as.integer(num),
+    stratum_1 = prop,
+    stratum_2 = sprintf("%i", num),
+    stratum_3 = sprintf("%i", den)
+  )
 }
 prepareResult <- function(res, id) {
   q <- paste0("stratum_", 1:5) |>

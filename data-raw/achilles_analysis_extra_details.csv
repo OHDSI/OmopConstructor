@@ -23,10 +23,29 @@ analysis_id,type,table,operation
 110,count person,observation_period,addPeriod month full
 111,count person,observation_period,addDate start month
 112,count person,observation_period,addDate end month
-113,count person,person,addNumberObservationPeriods
+113,count person,person,addCount observation_period number_of_observation_periods
 114,count person,observation_period,removeRecordsAfterBirth
 115,count person,observation_period,removeEndAfterStart
 116,count person,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
 117,count person,observation_period,addPeriod month one
 118,count record,observation_period,remove person person_id
 119,count record,observation_period,
+200,count person,visit_occurrence,
+201,count record,visit_occurrence,
+202,count person,visit_occurrence,addDate start month
+203,distribution number_visit_occurrences,person,addCount visit_occurrence number_visit_occurrences
+204,count person,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+206,distribution age,visit_occurrence,addGenderConceptId;addAge
+207,count record,visit_occurrence,remove person person_id
+209,count record,visit_occurrence,remove care_site care_site_id
+210,count record,visit_occurrence,observation start no
+211,count record,visit_occurrence,removeEndAfterStart
+212,count person,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+213,distribution duration,visit_occurrence,addDuration
+220,count record,visit_occurrence,addDate start month
+221,count person,visit_occurrence,addDate start year
+225,count record,visit_occurrence,
+226,count record,visit_occurrence,addCdmTable
+230,count record,visit_occurrence,observation start yes
+231,proportion record,visit_occurrence,observation start yes
+232,proportion person,visit_occurrence,observation start yes

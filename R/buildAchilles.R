@@ -317,6 +317,72 @@ operation <- function(x, op) {
       end <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "end_date")
       x <- x |>
         dplyr::filter(.data[[end]] < .data[[start]])
+    } else if (act[1] == "addCount") {
+      x <- x |>
+        dplyr::left_join(
+          cdm[[act[2]]] |>
+            dplyr::group_by(.data$person_id) |>
+            dplyr::tally(name = act[3]),
+          by = "person_id"
+        ) |>
+        dplyr::mutate(!!act[3] := dplyr::coalesce(as.integer(.data[[act[3]]]), 0L))
+    } else if (act[1] == "observation") {
+      if (act[2] == "start") {
+        col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
+      } else if (act[2] == "end") {
+        col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "end_date")
+      }
+      x <- x |>
+        dplyr::select(dplyr::all_of(c("person_id", date = col))) |>
+        dplyr::inner_join(
+          cdm$observation_period |>
+            dplyr::select(
+              "person_id",
+              "start_obs" = "observation_period_start_date",
+              "end_obs" = "observation_period_end_date"
+            ),
+          by = "person_id"
+        )
+      if (act[3] == "yes") {
+        x <- x |>
+          dplyr::filter(.data$start_obs <= .data$date & .data$date <= .data$end_obs)
+      } else if (act[3] == "no") {
+        x <- x |>
+          dplyr::filter(.data$date < .data$start_obs | .data$end_obs < .data$date)
+      }
+    } else if (act[1] == "addCdmTable") {
+      x <- x |>
+        dplyr::inner_join(
+          cdm$drug_exposure |>
+            dplyr::select("visit_occurrence_id") |>
+            dplyr::mutate(cdm_table_name = "drug_exposure") |>
+            dplyr::union_all(
+              cdm$condition_occurrence |>
+                dplyr::select("visit_occurrence_id") |>
+                dplyr::mutate(cdm_table_name = "condition_occurrence")
+            ) |>
+            dplyr::union_all(
+              cdm$device_exposure |>
+                dplyr::select("visit_occurrence_id") |>
+                dplyr::mutate(cdm_table_name = "device_exposure")
+            ) |>
+            dplyr::union_all(
+              cdm$procedure_occurrence |>
+                dplyr::select("visit_occurrence_id") |>
+                dplyr::mutate(cdm_table_name = "procedure_occurrence")
+            ) |>
+            dplyr::union_all(
+              cdm$measurement |>
+                dplyr::select("visit_occurrence_id") |>
+                dplyr::mutate(cdm_table_name = "measurement")
+            ) |>
+            dplyr::union_all(
+              cdm$observation |>
+                dplyr::select("visit_occurrence_id") |>
+                dplyr::mutate(cdm_table_name = "observation")
+            ),
+          by = "visit_occurrence_id"
+        )
     }
   }
   x

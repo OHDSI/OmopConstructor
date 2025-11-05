@@ -47,8 +47,8 @@ analysis_id,type,table,operation
 225,count record,visit_occurrence,
 226,count record,visit_occurrence,addCdmTable
 230,count record,visit_occurrence,observation start yes
-231,proportion record,visit_occurrence,observation start yes
-232,proportion person_id,visit_occurrence,observation start yes
+231,proportion record,visit_occurrence,observation start no
+232,proportion person_id,visit_occurrence,observation start no
 300,count provider_id,provider,
 301,count provider_id,provider,
 303,count record,provider,addVisitConceptId
@@ -72,5 +72,22 @@ analysis_id,type,table,operation
 424,coocurrent standard_concept,condition_occurrence,
 425,count record,condition_occurrence,
 430,count record,condition_occurrence,observation start yes
-431,proportion record,condition_occurrence,observation start yes
-432,proportion person_id,condition_occurrence,observation start yes
+431,proportion record,condition_occurrence,observation start no
+432,proportion person_id,condition_occurrence,observation start no
+500,count person_id,death,
+501,count record,death,
+502,count person_id,death,addDate start month
+504,count person_id,death,addGenderConceptId;addAgeDecile;addDate start year
+505,count record,death,
+506,distribution age,death,addGenderConceptId;addAge
+509,count record,death,remove person person_id
+510,count person_id,death,observation start no
+511,distribution time,death,addTimeToLast condition_occurrence
+512,distribution time,death,addTimeToLast drug_exposure
+513,distribution time,death,addTimeToLast visit_occurrence
+514,distribution time,death,addTimeToLast procedure_occurrence
+515,distribution time,death,addTimeToLast observation
+525,count record,death,
+530,count record,death,observation start yes
+531,proportion person_id,death,observation start no
+532,proportion record,death,observation start no

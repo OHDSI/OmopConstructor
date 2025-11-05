@@ -414,6 +414,22 @@ operation <- function(x, op) {
             dplyr::select(dplyr::all_of(c("visit_concept_id", col))),
           by = col
         )
+    } else if (act[1] == "addTimeToLast") {
+      nm1 <- omopgenerics::tableName(table = x)
+      col1 <- omopgenerics::omopColumns(table = nm1, field = "start_date")
+      nm2 <- act[2]
+      col2 <- omopgenerics::omopColumns(table = nm2, field = "start_date")
+      x <- x |>
+        dplyr::select(dplyr::all_of(c("person_id", date1 = col1))) |>
+        dplyr::inner_join(
+          cdm[[nm2]] |>
+            dplyr::group_by(.data$person_id) |>
+            dplyr::summarise(date2 = max(.data[[col2]])),
+          by = "person_id"
+        ) |>
+        dplyr::mutate(time = clock::date_count_between(
+          start = .data$date1, end = .data$date2, precision = "day"
+        ))
     }
   }
   x

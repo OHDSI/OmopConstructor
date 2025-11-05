@@ -171,6 +171,8 @@ appendAchillesId <- function(cdm, id) {
     res <- coocurrent(x = x, col = types[2])
   } else if (types[1] == "conceptDistribution") {
     res <- conceptDistribution(x = x)
+  } else if (types[1] == "noValue") {
+    res <- noValue(x = x)
   } else {
     cli::cli_abort(c(x = "Not configured analysis"))
   }
@@ -566,6 +568,13 @@ conceptDistribution <- function(x) {
     dplyr::mutate(count_value = cumsum(.data$count_value)) |>
     dplyr::ungroup() |>
     dplyr::mutate(stratum_2 = - .data$stratum_2)
+}
+noValue <- function(x) {
+  cols <- colnames(x)
+  cols <- cols[stringr::str_starts(string = cols, pattern = "value_")]
+  x |>
+    dplyr::filter(dplyr::if_all(.cols = dplyr::all_of(cols), .fns = \(col) is.na(col))) |>
+    dplyr::tally(name = "count_value")
 }
 prepareResult <- function(res, id) {
   q <- paste0("stratum_", 1:5) |>

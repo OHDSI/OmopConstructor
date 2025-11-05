@@ -109,3 +109,64 @@ analysis_id,type,table,operation
 631,proportion person_id,procedure_occurrence,observation start no
 632,proportion record,procedure_occurrence,observation start no
 691,conceptDistribution,procedure_occurrence,
+700,count person_id,drug_exposure,
+701,count record,drug_exposure,
+702,count person_id,drug_exposure,addDate start month
+703,distribution number_concepts,person,addCount drug_exposure drug_concept_id number_concepts
+704,count person_id,drug_exposure,addGenderConceptId;addAgeDecile;addDate start year
+705,count record,drug_exposure,
+706,distribution age,drug_exposure,addGenderConceptId;addAge
+709,count record,drug_exposure,remove person person_id
+710,count record,drug_exposure,observation start no
+711,count record,drug_exposure,removeEndAfterStart
+712,count record,drug_exposure,remove provider provider_id
+713,count record,drug_exposure,remove visit_occurrence visit_occurrence_id
+715,distribution days_supply,drug_exposure,
+716,distribution refills,drug_exposure,
+717,distribution quantity,drug_exposure,
+720,count record,drug_exposure,addDate start month
+724,coocurrent standard_concept,drug_exposure,
+725,count record,drug_exposure,
+730,count record,drug_exposure,observation start yes
+731,proportion person_id,drug_exposure,observation start no
+732,proportion record,drug_exposure,observation start no
+791,conceptDistribution,drug_exposure,
+800,count person_id,observation,
+801,count record,observation,
+802,count person_id,observation,addDate start month
+803,distribution number_concepts,person,addCount observation observation_concept_id number_concepts
+804,count person_id,observation,addGenderConceptId;addAgeDecile;addDate start year
+805,count record,observation,
+806,distribution age,observation,addGenderConceptId;addAge
+807,count record,observation,
+809,count record,observation,remove person person_id
+810,count record,observation,observation start no
+812,count record,observation,remove provider provider_id
+813,count record,observation,remove visit_occurrence visit_occurrence_id
+814,noValue,observation,
+815,distribution value_as_number,observation,
+820,count record,observation,addDate start month
+822,count record,observation,
+823,count record,observation,
+824,coocurrent standard_concept,observation,
+825,count record,observation,
+826,count record,observation,
+827,count record,observation,
+830,count record,observation,observation start yes
+831,proportion person_id,observation,observation start no
+832,proportion record,observation,observation start no
+891,conceptDistribution,observation,
+900,count person_id,drug_era,
+901,count record,drug_era,
+902,count person_id,drug_era,addDate start month
+903,distribution number_concepts,person,addCount drug_era drug_concept_id number_concepts
+904,count person_id,drug_era,addGenderConceptId;addAgeDecile;addDate start year
+906,distribution age,drug_era,addGenderConceptId;addAge
+907,count record,drug_era,
+908,count record,drug_era,remove person person_id
+910,count record,drug_era,drug_era start no
+911,count record,drug_exposure,removeEndAfterStart
+920,count record,drug_era,addDate start month
+930,count record,drug_era,drug_era start yes
+931,proportion person_id,drug_era,drug_era start no
+932,proportion record,drug_era,drug_era start no

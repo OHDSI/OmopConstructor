@@ -14,8 +14,10 @@ achillesAnalisisDetails <- readr::read_csv(
   )) |>
   dplyr::relocate("is_minimal", .before = "category") |>
   # issue 790 Achilles
-  dplyr::mutate(stratum_1_name = dplyr::if_else(
-    .data$analysis_id == 226, "visit_concept_id", .data$stratum_1_name
+  dplyr::mutate(stratum_1_name = dplyr::case_when(
+    .data$analysis_id == 226 ~ "visit_concept_id",
+    .data$analysis_id == 827 ~ "unit_concept_id",
+    .default = .data$stratum_1_name
   ))
 
 extraDetails <- readr::read_csv(

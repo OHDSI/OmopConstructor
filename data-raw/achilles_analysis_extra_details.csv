@@ -23,7 +23,7 @@ analysis_id,type,table,operation
 110,count person_id,observation_period,addPeriod month full
 111,count person_id,observation_period,addDate start month
 112,count person_id,observation_period,addDate end month
-113,count person_id,person,addCount observation_period number_of_observation_periods
+113,count person_id,person,addCount observation_period record number_of_observation_periods
 114,count person_id,observation_period,removeRecordsAfterBirth
 115,count person_id,observation_period,removeEndAfterStart
 116,count person_id,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
@@ -33,7 +33,7 @@ analysis_id,type,table,operation
 200,count person_id,visit_occurrence,
 201,count record,visit_occurrence,
 202,count person_id,visit_occurrence,addDate start month
-203,distribution number_visit_occurrences,person,addCount visit_occurrence number_visit_occurrences
+203,distribution number_visit_occurrences,person,addCount visit_occurrence record number_visit_occurrences
 204,count person_id,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
 206,distribution age,visit_occurrence,addGenderConceptId;addAge
 207,count record,visit_occurrence,remove person person_id
@@ -48,8 +48,29 @@ analysis_id,type,table,operation
 226,count record,visit_occurrence,addCdmTable
 230,count record,visit_occurrence,observation start yes
 231,proportion record,visit_occurrence,observation start yes
-232,proportion person,visit_occurrence,observation start yes
+232,proportion person_id,visit_occurrence,observation start yes
 300,count provider_id,provider,
 301,count provider_id,provider,
 303,count record,provider,addVisitConceptId
 325,count record,provider,
+400,count person_id,condition_occurrence,
+401,count record,condition_occurrence,
+402,count person_id,condition_occurrence,addDate start month
+403,distribution number_concepts,person,addCount condition_occurrence condition_concept_id number_concepts
+404,count person_id,condition_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+405,count record,condition_occurrence,
+406,distribution age,condition_occurrence,addAge;addGenderConceptId
+409,count record,condition_occurrence,remove person person_id
+410,count record,condition_occurrence,observation start no
+411,count record,condition_occurrence,removeEndAfterStart
+412,count record,condition_occurrence,remove provider provider_id
+413,count record,condition_occurrence,remove visit_occurrence visit_occurrence_id
+414,count record,condition_occurrence,
+415,count record,condition_occurrence,
+416,count record,condition_occurrence,
+420,count record,condition_occurrence,addDate start month
+424,coocurrent standard_concept,condition_occurrence,
+425,count record,condition_occurrence,
+430,count record,condition_occurrence,observation start yes
+431,proportion record,condition_occurrence,observation start yes
+432,proportion person_id,condition_occurrence,observation start yes

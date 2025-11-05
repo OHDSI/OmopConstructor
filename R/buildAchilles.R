@@ -153,26 +153,27 @@ appendAchillesId <- function(cdm, id) {
   # perform operation
   x <- operation(x = x, op = analysis$operation)
 
-  # name of the table
+  # table name
   nm <- omopgenerics::uniqueTableName()
 
   # perform calculation
-  if (types[[1]] == "update") {
+  if (types[1] == "update") {
     res <- update(cdm = cdm)
-  } else if (types[[1]] == "count") {
+  } else if (types[1] == "count") {
     by <- groupBy(analysis = analysis)
-    res <- counts(x = x, by = by, count = types[[2]])
-  } else if (types[[1]] == "distribution") {
+    res <- counts(x = x, by = by, count = types[2])
+  } else if (types[1] == "distribution") {
     by <- groupBy(analysis = analysis)
     res <- distribution(x = x, by = by, value = types[[2]])
-  } else if (types[[1]] == "proportion") {
-    res <- proportion(x = x, count = types[[2]], den = den)
+  } else if (types[1] == "proportion") {
+    res <- proportion(x = x, count = types[2], den = den)
+  } else if (types[1] == "coocurrent") {
+    res <- coocurrent(x = x, col = types[2], nm = nm)
   } else {
     cli::cli_abort(c(x = "Not configured analysis"))
   }
 
   # compute table
-  nm <- omopgenerics::uniqueTableName()
   if (inherits(x = res, what = "data.frame")) {
     cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = res)
     res <- cdm[[nm]]
@@ -330,14 +331,24 @@ operation <- function(x, op) {
       x <- x |>
         dplyr::filter(.data[[end]] < .data[[start]])
     } else if (act[1] == "addCount") {
+      table <- act[2]
+      count <- act[3]
+      name <- act[4]
+      if (count == "record") {
+        q <- "dplyr::n()"
+      } else {
+        q <- paste0("dplyr::n_distinct(.data$", count, ")")
+      }
+      names(q) <- name
+      q <- rlang::parse_exprs(x = q)
       x <- x |>
         dplyr::left_join(
-          cdm[[act[2]]] |>
+          cdm[[table]] |>
             dplyr::group_by(.data$person_id) |>
-            dplyr::tally(name = act[3]),
+            dplyr::summarise(!!!q),
           by = "person_id"
         ) |>
-        dplyr::mutate(!!act[3] := dplyr::coalesce(as.integer(.data[[act[3]]]), 0L))
+        dplyr::mutate(!!name := dplyr::coalesce(as.integer(.data[[name]]), 0L))
     } else if (act[1] == "observation") {
       if (act[2] == "start") {
         col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
@@ -408,7 +419,7 @@ operation <- function(x, op) {
   x
 }
 analysisType <- function(type) {
-  as.list(stringr::str_split_1(string = type, pattern = " "))
+  stringr::str_split_1(string = type, pattern = " ")
 }
 update <- function(cdm) {
   cdm$person |>
@@ -475,6 +486,36 @@ proportion <- function(x, count, den) {
     stratum_2 = sprintf("%i", num),
     stratum_3 = sprintf("%i", den)
   )
+}
+coocurrent <- function(x, col, nm) {
+  tn <- omopgenerics::tableName(table = x)
+  col <- omopgenerics::omopColumns(table = tn, field = col)
+  date <- omopgenerics::omopColumns(table = tn, field = "start_date")
+  sel1 <- c("person_id", stratum_1 = col, date = date)
+  sel2 <- c("person_id", stratum_2 = col, date = date)
+  x |>
+    dplyr::select(dplyr::all_of(sel1)) |>
+    dplyr::inner_join(
+      x |>
+        dplyr::select(dplyr::all_of(sel2)),
+      by = c("person_id", "date")
+    ) |>
+    dplyr::filter(.data$stratum_1 != .data$stratum_2) |>
+    dplyr::group_by(.data$stratum_1, .data$stratum_2) |>
+    dplyr::summarise(
+      stratum_4 = -as.integer(dplyr::n_distinct(.data$person_id)),
+      stratum_5 = -as.integer(dplyr::n()),
+      .groups = "drop",
+    ) |>
+    dplyr::arrange(.data$stratum_4, .data$stratum_5) |>
+    dplyr::mutate(
+      stratum_3 = dplyr::row_number(),
+      count_value = -.data$stratum_4,
+      stratum_4 = -.data$stratum_4,
+      stratum_5 = -.data$stratum_5
+    ) |>
+    dplyr::arrange() |>
+    dplyr::filter(.data$stratum_3 <= 10)
 }
 prepareResult <- function(res, id) {
   q <- paste0("stratum_", 1:5) |>

@@ -11,3 +11,22 @@ analysis_id,type,table,operation
 10,count record,person,
 11,count record,person,remove death person_id
 12,count record,person,
+101,count person,observation_period,first;addAge
+102,count person,observation_period,first;addGenderConceptId;addAge
+103,distribution age,observation_period,first;addAge
+104,distribution age,observation_period,first;addGenderConceptId;addAge
+105,distribution duration,observation_period,first;addDuration
+106,distribution duration,observation_period,first;addGenderConceptId;addDuration
+107,distribution duration,observation_period,first;addDuration;addAgeDecile
+108,count person,observation_period,addDuration30d observation_period_length_30d_increments
+109,count person,observation_period,addPeriod year full
+110,count person,observation_period,addPeriod month full
+111,count person,observation_period,addDate start month
+112,count person,observation_period,addDate end month
+113,count person,person,addNumberObservationPeriods
+114,count person,observation_period,removeRecordsAfterBirth
+115,count person,observation_period,removeEndAfterStart
+116,count person,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
+117,count person,observation_period,addPeriod month one
+118,count record,observation_period,remove person person_id
+119,count record,observation_period,

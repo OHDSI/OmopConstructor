@@ -11,41 +11,45 @@ analysis_id,type,table,operation
 10,count record,person,
 11,count record,person,remove death person_id
 12,count record,person,
-101,count person,observation_period,first;addAge
-102,count person,observation_period,first;addGenderConceptId;addAge
+101,count person_id,observation_period,first;addAge
+102,count person_id,observation_period,first;addGenderConceptId;addAge
 103,distribution age,observation_period,first;addAge
 104,distribution age,observation_period,first;addGenderConceptId;addAge
 105,distribution duration,observation_period,first;addDuration
 106,distribution duration,observation_period,first;addGenderConceptId;addDuration
 107,distribution duration,observation_period,first;addDuration;addAgeDecile
-108,count person,observation_period,addDuration30d observation_period_length_30d_increments
-109,count person,observation_period,addPeriod year full
-110,count person,observation_period,addPeriod month full
-111,count person,observation_period,addDate start month
-112,count person,observation_period,addDate end month
-113,count person,person,addCount observation_period number_of_observation_periods
-114,count person,observation_period,removeRecordsAfterBirth
-115,count person,observation_period,removeEndAfterStart
-116,count person,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
-117,count person,observation_period,addPeriod month one
+108,count person_id,observation_period,addDuration30d observation_period_length_30d_increments
+109,count person_id,observation_period,addPeriod year full
+110,count person_id,observation_period,addPeriod month full
+111,count person_id,observation_period,addDate start month
+112,count person_id,observation_period,addDate end month
+113,count person_id,person,addCount observation_period number_of_observation_periods
+114,count person_id,observation_period,removeRecordsAfterBirth
+115,count person_id,observation_period,removeEndAfterStart
+116,count person_id,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
+117,count person_id,observation_period,addPeriod month one
 118,count record,observation_period,remove person person_id
 119,count record,observation_period,
-200,count person,visit_occurrence,
+200,count person_id,visit_occurrence,
 201,count record,visit_occurrence,
-202,count person,visit_occurrence,addDate start month
+202,count person_id,visit_occurrence,addDate start month
 203,distribution number_visit_occurrences,person,addCount visit_occurrence number_visit_occurrences
-204,count person,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+204,count person_id,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
 206,distribution age,visit_occurrence,addGenderConceptId;addAge
 207,count record,visit_occurrence,remove person person_id
 209,count record,visit_occurrence,remove care_site care_site_id
 210,count record,visit_occurrence,observation start no
 211,count record,visit_occurrence,removeEndAfterStart
-212,count person,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+212,count person_id,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
 213,distribution duration,visit_occurrence,addDuration
 220,count record,visit_occurrence,addDate start month
-221,count person,visit_occurrence,addDate start year
+221,count person_id,visit_occurrence,addDate start year
 225,count record,visit_occurrence,
 226,count record,visit_occurrence,addCdmTable
 230,count record,visit_occurrence,observation start yes
 231,proportion record,visit_occurrence,observation start yes
 232,proportion person,visit_occurrence,observation start yes
+300,count provider_id,provider,
+301,count provider_id,provider,
+303,count record,provider,addVisitConceptId
+325,count record,provider,

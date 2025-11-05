@@ -383,6 +383,14 @@ operation <- function(x, op) {
             ),
           by = "visit_occurrence_id"
         )
+    } else if (act[1] == "addVisitConceptId") {
+      col <- intersect(colnames(x), colnames(cdm$visit_occurrence))
+      x <- x |>
+        dplyr::inner_join(
+          cdm$visit_occurrence |>
+            dplyr::select(dplyr::all_of(c("visit_concept_id", col))),
+          by = col
+        )
     }
   }
   x
@@ -411,9 +419,11 @@ groupBy <- function(analysis) {
   return(by)
 }
 counts <- function(x, by, count) {
-  fun <- switch(count,
-                "record" = "dplyr::n()",
-                "person" = "dplyr::n_distinct(.data$person_id)")
+  if (count == "record") {
+    fun <- "dplyr::n()"
+  } else {
+    fun <- paste0("dplyr::n_distinct(.data$", count, ")")
+  }
   q <- paste0("as.integer(", fun, ")") |>
     rlang::set_names("count_value") |>
     rlang::parse_exprs()

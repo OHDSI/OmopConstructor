@@ -143,7 +143,7 @@ analysis_id,type,table,operation
 810,count record,observation,observation start no
 812,count record,observation,remove provider provider_id
 813,count record,observation,remove visit_occurrence visit_occurrence_id
-814,noValue,observation,
+814,count person_id,observation,value no value_as_number value_as_string value_as_concept_id
 815,distribution value_as_number,observation,
 820,count record,observation,addDate start month
 822,count record,observation,
@@ -250,14 +250,17 @@ analysis_id,type,table,operation
 1807,count record,measurement,
 1809,count record,measurement,remove person person_id
 1810,count record,measurement,observation start no
+1811,count person_id,measurement,value yes value_as_number value_as_concept_id
 1812,count record,measurement,remove provider provider_id
 1813,count record,measurement,remove visit_occurrence visit_occurrence_id
-1814,noValue,measurement,
+1814,count person_id,measurement,value no value_as_number value_as_concept_id
 1815,distribution value_as_number,measurement,
 1816,distribution range_low,measurement,
 1817,distribution range_high,measurement,
 1818,count record,measurement,addMeasurementRange
+1819,count person_id,measurement,value yes value_as_number value_as_concept_id
 1820,count record,measurement,addDate start month
+1821,count person_id,measurement,value no value_as_number
 1822,count record,measurement,
 1823,count record,measurement,
 1824,coocurrent standard_concept,measurement,
@@ -267,7 +270,14 @@ analysis_id,type,table,operation
 1830,count record,measurement,observation start yes
 1831,proportion person_id,measurement,observation start no
 1832,proportion record,measurement,observation start no
+1833,proportion record,measurement,value yes value_as_number value_as_concept_id
 1891,conceptDistribution,measurement,
+1900,count record,person,completeness
+2000,overlap no condition_occurrence drug_exposure,person,
+2001,overlap no procedure_occurrence drug_exposure,person,
+2002,overlap no condition_occurrence drug_exposure measurement,person,
+2003,count person_id,visit_occurrence,
+2004,overlap comb all,person,
 2100,count person_id,device_exposure,
 2101,count record,device_exposure,
 2102,count person_id,device_exposure,addDate start month

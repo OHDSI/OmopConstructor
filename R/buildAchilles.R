@@ -148,8 +148,9 @@ appendAchillesId <- function(cdm, id) {
 
   # proportion denominator
   if (types[[1]] == "proportion") {
-    den <- counts(x = x, by = character(), count = types[[2]]) |>
-      dplyr::pull()
+    by <- groupBy(analysis = analysis)
+    den <- counts(x = x, by = by, count = types[[2]]) |>
+      dplyr::collect()
   }
 
   # perform operation
@@ -168,13 +169,13 @@ appendAchillesId <- function(cdm, id) {
     by <- groupBy(analysis = analysis)
     res <- distribution(x = x, by = by, value = types[[2]])
   } else if (types[1] == "proportion") {
-    res <- proportion(x = x, count = types[2], den = den)
+    res <- proportion(x = x, count = types[2], den = den, by = by)
   } else if (types[1] == "coocurrent") {
     res <- coocurrent(x = x, col = types[2])
   } else if (types[1] == "conceptDistribution") {
     res <- conceptDistribution(x = x)
-  } else if (types[1] == "noValue") {
-    res <- noValue(x = x)
+  } else if (types[1] == "overlap") {
+    res <- overlap(x = x, tables = types[-c(1:2)], comb = types[2] == "comb")
   } else {
     cli::cli_abort(c(x = "Not configured analysis"))
   }
@@ -197,7 +198,7 @@ appendAchillesId <- function(cdm, id) {
     dplyr::compute(name = name)
 
   # drop table
-  omopgenerics::dropSourceTable(cdm = cdm, name = nm)
+  cdm <- omopgenerics::dropSourceTable(cdm = cdm, name = nm)
 
   return(cdm)
 }
@@ -483,11 +484,66 @@ operation <- function(x, op) {
           .data$value_as_number > .data$range_high ~ "Above Range High",
           .data$value_as_number >= .data$range_low & .data$value_as_number <= .data$range_high ~ "Within Range"
         ))
+    } else if (act[1] == "value") {
+      val <- act[2]
+      if (val == "yes") {
+        xx <- c("!is.na(.data$col)", "(!is.na(.data$col) & .data$col != 0)")
+        sep <- " | "
+      } else {
+        xx <- c("is.na(.data$col)", "(is.na(.data$col) | .data$col == 0)")
+        sep <- " & "
+      }
+      cols <- act[-(1:2)]
+      q <- character()
+      for (col in cols) {
+        if (endsWith(x = col, suffix = "concept_id")) {
+          q <- c(q, stringr::str_replace_all(string = xx[2], pattern = "col", replacement = col))
+        } else {
+          q <- c(q, stringr::str_replace_all(string = xx[1], pattern = "col", replacement = col))
+        }
+      }
+      q <- rlang::parse_exprs(paste0(q, collapse = sep))
+      x <- x |>
+        dplyr::filter(!!!q)
+    } else if (act[1] == "completeness") {
+      x <- completeness(x)
     } else {
       cli::cli_abort(c(x = "Not configured analysis"))
     }
   }
   x
+}
+completeness <- function(x) {
+  cdm <- omopgenerics::cdmReference(table = x)
+  c("measurement", "procedure_occurrence", "drug_exposure",
+    "condition_occurrence", "observation", "payer_plan_period", "provider",
+    "person", "specimen", "visit_detail", "visit_occurrence", "device_exposure",
+    "death") |>
+    purrr::map(\(x) {
+      if (x %in% names(cdm)) {
+        cols <- colnames(cdm[[x]])
+        values <- cols[endsWith(x = cols, suffix = "_source_value")] |>
+          stringr::str_replace(pattern = "_source_value$", replacement = "")
+        concepts <- cols[endsWith(x = cols, suffix = "_concept_id")] |>
+          stringr::str_replace(pattern = "_concept_id$", replacement = "")
+        pref <- intersect(values, concepts)
+        dplyr::tibble(prefix = pref) |>
+          dplyr::mutate(table_name = .env$x)
+      } else {
+        NULL
+      }
+    }) |>
+    purrr::compact() |>
+    dplyr::bind_rows() |>
+    purrr::pmap(\(prefix, table_name) {
+      col <- paste0(prefix, "_source_value")
+      con <- paste0(prefix, "_concept_id")
+      cdm[[table_name]] |>
+        dplyr::filter(.data[[con]] == 0) |>
+        dplyr::select(dplyr::all_of(c(source_value = col))) |>
+        dplyr::mutate(table_name = !!table_name, column_name = !!col)
+    }) |>
+    purrr::reduce(dplyr::union_all)
 }
 analysisType <- function(type) {
   stringr::str_split_1(string = type, pattern = " ")
@@ -509,6 +565,10 @@ groupBy <- function(analysis) {
     as.list() |>
     purrr::map_chr(omopgenerics::toSnakeCase) |>
     purrr::keep(\(x) !is.na(x))
+  if ("proportion" %in% by) {
+    by <- by |>
+      purrr::keep(\(x) stringr::str_starts(string = x, pattern = "proportion|number", negate = TRUE))
+  }
   names(by) <- stringr::str_remove(names(by), "_name$")
   return(by)
 }
@@ -559,21 +619,42 @@ distribution <- function(x, by, value) {
     )
   }
 }
-proportion <- function(x, count, den) {
-  if (den == 0) {
-    prop <- NA_character_
-    num <- 0
+proportion <- function(x, count, den, by) {
+  num <- counts(x = x, by = by, count = count) |>
+    dplyr::collect()
+  if (length(by) == 0) {
+    res <- dplyr::tibble(
+      num = as.integer(dplyr::pull(num)),
+      den = as.integer(dplyr::pull(den))
+    )
   } else {
-    num <- counts(x = x, by = character(), count = count) |>
-      dplyr::pull()
-    prop <- sprintf("%.f", as.numeric(num) / as.numeric(den))
+    res <- num |>
+      dplyr::rename("num" = "count_value") |>
+      dplyr::inner_join(
+        den |>
+          dplyr::rename("den" = "count_value"),
+        by = names(by)
+      )
   }
-  dplyr::tibble(
-    count_value = as.integer(num),
-    stratum_1 = prop,
-    stratum_2 = sprintf("%i", num),
-    stratum_3 = sprintf("%i", den)
-  )
+  res <- res |>
+    dplyr::mutate(prop = dplyr::if_else(
+      .data$den == 0L,
+      NA_character_,
+      sprintf("%f", as.numeric(.data$num) / as.numeric(.data$den))
+    ))
+  if (length(by) == 0) {
+    res <- res |>
+      dplyr::mutate(stratum_1 = .data$prop, stratum_3 = sprintf("%i", .data$den))
+  } else {
+    res <- res |>
+      dplyr::mutate(stratum_3 = .data$prop)
+  }
+  res |>
+    dplyr::mutate(
+      stratum_2 = sprintf("%i", .data$num),
+      count_value = sprintf("%i", .data$den)
+    ) |>
+    dplyr::select("count_value", dplyr::starts_with("stratum_"))
 }
 coocurrent <- function(x, col) {
   tn <- omopgenerics::tableName(table = x)
@@ -620,12 +701,60 @@ conceptDistribution <- function(x) {
     dplyr::ungroup() |>
     dplyr::mutate(stratum_2 = - .data$stratum_2)
 }
-noValue <- function(x) {
-  cols <- colnames(x)
-  cols <- cols[stringr::str_starts(string = cols, pattern = "value_")]
-  x |>
-    dplyr::filter(dplyr::if_all(.cols = dplyr::all_of(cols), .fns = \(col) is.na(col))) |>
-    dplyr::tally(name = "count_value")
+overlap <- function(x, tables, comb) {
+  # prefix for tables
+  prefix <- omopgenerics::tmpPrefix()
+  cdm <- omopgenerics::cdmReference(table = x)
+
+  if (identical(tables, "all")) {
+    tables <- c("condition_occurrence", "drug_exposure", "device_exposure",
+                "measurement", "death", "procedure_occurrence", "observation")
+  }
+  tables <- tables |>
+    rlang::set_names() |>
+    purrr::map(\(x) {
+      cdm[[x]] |>
+        dplyr::distinct(.data$person_id) |>
+        dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+    })
+
+  if (comb) {
+    den <- cdm$person |>
+      dplyr::tally() |>
+      dplyr::pull() |>
+      as.numeric()
+    x <- rep(list(c(0,1)), length(tables)) |>
+      rlang::set_names(names(tables)) |>
+      expand.grid() |>
+      dplyr::as_tibble() |>
+      dplyr::mutate(sum = rowSums(dplyr::across(dplyr::everything()))) |>
+      dplyr::filter(.data$sum >= 2) |>
+      dplyr::select(!"sum")
+    nm <- apply(x, 1, \(k) paste0(k, collapse = ""))
+    res <- apply(x, 1, \(v) names(x)[v == 1]) |>
+      rlang::set_names(nm = nm) |>
+      purrr::imap(\(tab, key) {
+        tables[tab] |>
+          purrr::reduce(\(x, y) dplyr::inner_join(x, y, by = "person_id")) |>
+          dplyr::tally(name = "count_value") |>
+          dplyr::collect() |>
+          dplyr::mutate(
+            count_value = as.integer(.data$count_value),
+            stratum_1 = .env$key,
+            stratum_2 = sprintf("%f", as.numeric(.data$count_value)/.env$den)
+          )
+      }) |>
+      dplyr::bind_rows()
+  } else {
+    res <- tables |>
+      purrr::reduce(\(x, y) dplyr::inner_join(x, y, by = "person_id")) |>
+      dplyr::tally(name = "count_value") |>
+      dplyr::collect()
+  }
+
+  omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))
+
+  return(res)
 }
 prepareResult <- function(res, id) {
   q <- paste0("stratum_", 1:5) |>

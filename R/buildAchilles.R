@@ -641,7 +641,7 @@ proportion <- function(x, count, den, by) {
   res |>
     dplyr::mutate(
       stratum_2 = sprintf("%i", .data$num),
-      count_value = sprintf("%i", .data$den)
+      count_value = as.integer(.data$den)
     ) |>
     dplyr::select("count_value", dplyr::starts_with("stratum_"))
 }
@@ -686,7 +686,7 @@ conceptDistribution <- function(x) {
     dplyr::tally(name = "count_value") |>
     dplyr::group_by(.data$stratum_1) |>
     dplyr::arrange(.data$stratum_2) |>
-    dplyr::mutate(count_value = cumsum(.data$count_value)) |>
+    dplyr::mutate(count_value = as.integer(cumsum(.data$count_value))) |>
     dplyr::ungroup() |>
     dplyr::mutate(stratum_2 = - .data$stratum_2)
 }
@@ -738,7 +738,8 @@ overlap <- function(x, tables, comb) {
     res <- tables |>
       purrr::reduce(\(x, y) dplyr::inner_join(x, y, by = "person_id")) |>
       dplyr::tally(name = "count_value") |>
-      dplyr::collect()
+      dplyr::collect() |>
+      dplyr::mutate(count_value = as.integer(.data$count_value))
   }
 
   omopgenerics::dropSourceTable(cdm = cdm, name = dplyr::starts_with(prefix))

@@ -30,7 +30,9 @@ buildAchilles <- function(cdm,
       dplyr::pull("analysis_name")
     kk <- sprintf("%i", k) |>
       stringr::str_pad(width = nchar(len), pad = " ")
-    cli::cli_inform(c("i" = "{kk} of {len}: Get achilles result for {.pkg {nm}}."))
+    ei <- sprintf("%i", id) |>
+      stringr::str_pad(width = 4, pad = " ")
+    cli::cli_inform(c("i" = "{kk} of {len}: {.emph ID-{ei}} {.pkg {nm}}."))
     cdm <- appendAchillesId(cdm, id)
   }
 
@@ -224,17 +226,32 @@ operation <- function(x, op) {
         dplyr::group_by(.data$person_id) |>
         dplyr::filter(.data[[col]] == min(.data[[col]], na.rm = TRUE)) |>
         dplyr::ungroup()
-    } else if (act[1] == "addAge") {
+    } else if (act[1] == "addDemo") {
       col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
+      gender <- "gender" %in% act
+      q <- list()
+      if (gender) {
+        q$gender_concept_id <- 'dplyr::case_when(
+            .data$sex == "Female" ~ 8532L,
+            .data$sex == "Male" ~ 8507L,
+            .default = NA_integer_
+          )'
+      }
+      if ("decile" %in% act) {
+        q$age_decile <- "floor(.data$age/10)"
+      }
       x <- x |>
-        PatientProfiles::addAgeQuery(indexDate = col)
-    } else if (act[1] == "addGenderConceptId") {
-      x <- x |>
-        dplyr::left_join(
-          cdm$person |>
-            dplyr::select("person_id", "gender_concept_id"),
-          by = "person_id"
+        PatientProfiles::addDemographicsQuery(
+          age = TRUE,
+          sex = gender,
+          priorObservation = FALSE,
+          futureObservation = FALSE,
+          indexDate = col
         )
+      if (length(q) > 0) {
+        q <- rlang::parse_exprs(unlist(q))
+        x <- dplyr::mutate(x, !!!q)
+      }
     } else if (act[1] == "addDuration") {
       start <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
       end <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "end_date")
@@ -242,11 +259,6 @@ operation <- function(x, op) {
         dplyr::mutate(duration = clock::date_count_between(
           start = .data[[start]], end = .data[[end]], precision = "day"
         ))
-    } else if (act[1] == "addAgeDecile") {
-      col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
-      x <- x |>
-        PatientProfiles::addAgeQuery(indexDate = col) |>
-        dplyr::mutate(age_decile = floor(.data$age/10))
     } else if (act[1] == "addDuration30d") {
       col <- act[2]
       start <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
@@ -256,45 +268,53 @@ operation <- function(x, op) {
           start = .data[[start]], end = .data[[end]], precision = "day"
         )/30)))
     } else if (act[1] == "addPeriod") {
-      start <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
-      end <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "end_date")
-      startYear <- x |>
-        dplyr::summarise(x = min(.data[[start]], na.rm = TRUE)) |>
-        dplyr::pull("x") |>
-        clock::get_year()
-      endYear <- x |>
-        dplyr::summarise(x = max(.data[[end]], na.rm = TRUE)) |>
-        dplyr::pull("x") |>
-        clock::get_year()
-      if (act[2] == "year") {
-        y <- dplyr::tibble(calendar_year = as.integer(startYear:endYear)) |>
-          dplyr::mutate(
-            start_date = as.Date(paste0(.data$calendar_year, "-01-01")),
-            end_date = as.Date(paste0(.data$calendar_year, "-12-31"))
-          )
-      } else if (act[2] == "month") {
-        y <- tidyr::expand_grid(year = startYear:endYear, month = 1:12) |>
-          dplyr::mutate(
-            calendar_month = as.integer(year * 100 + month),
-            start_date = as.Date(sprintf("%i-%02i-01", .data$year, .data$month)),
-            end_date = as.Date(clock::add_days(clock::add_months(.data$start_date, 1), -1))
-          ) |>
-          dplyr::select(!c("year", "month"))
-      }
-      nm <- omopgenerics::uniqueTableName()
-      cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = y, temporary = TRUE)
-      x <- x |>
-        dplyr::cross_join(cdm[[nm]])
-      if (act[3] == "full") {
+      if (!omopgenerics::isTableEmpty(table = x)) {
+        start <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
+        end <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "end_date")
+        startYear <- x |>
+          dplyr::summarise(x = min(.data[[start]], na.rm = TRUE)) |>
+          dplyr::pull("x") |>
+          clock::get_year()
+        endYear <- x |>
+          dplyr::summarise(x = max(.data[[end]], na.rm = TRUE)) |>
+          dplyr::pull("x") |>
+          clock::get_year()
+        if (act[2] == "year") {
+          y <- dplyr::tibble(calendar_year = as.integer(startYear:endYear)) |>
+            dplyr::mutate(
+              start_date = as.Date(paste0(.data$calendar_year, "-01-01")),
+              end_date = as.Date(paste0(.data$calendar_year, "-12-31"))
+            )
+        } else if (act[2] == "month") {
+          y <- tidyr::expand_grid(year = startYear:endYear, month = 1:12) |>
+            dplyr::mutate(
+              calendar_month = as.integer(year * 100 + month),
+              start_date = as.Date(sprintf("%i-%02i-01", .data$year, .data$month)),
+              end_date = as.Date(clock::add_days(clock::add_months(.data$start_date, 1), -1))
+            ) |>
+            dplyr::select(!c("year", "month"))
+        }
+        nm <- omopgenerics::uniqueTableName()
+        cdm <- omopgenerics::insertTable(cdm = cdm, name = nm, table = y, temporary = TRUE)
         x <- x |>
-          dplyr::filter(
-            .data$start_date >= .data[[start]] & .data$end_date <= .data[[end]]
-          )
-      } else if (act[3] == "one") {
-        x <- x |>
-          dplyr::filter(
-            .data$start_date <= .data[[end]] & .data$end_date >= .data[[start]]
-          )
+          dplyr::cross_join(cdm[[nm]])
+        if (act[3] == "full") {
+          x <- x |>
+            dplyr::filter(
+              .data$start_date >= .data[[start]] & .data$end_date <= .data[[end]]
+            )
+        } else if (act[3] == "one") {
+          x <- x |>
+            dplyr::filter(
+              .data$start_date <= .data[[end]] & .data$end_date >= .data[[start]]
+            )
+        }
+      } else {
+        if (act[2] == "year") {
+          x <- dplyr::mutate(x, calendar_year = as.integer(NA))
+        } else if (act[2] == "month") {
+          x <- dplyr::mutate(x, calendar_month = as.integer(NA))
+        }
       }
     } else if (act[1] == "addDate") {
       if (act[2] == "start") {
@@ -410,14 +430,6 @@ operation <- function(x, op) {
             ),
           by = "visit_occurrence_id"
         )
-    } else if (act[1] == "addVisitConceptId") {
-      col <- intersect(colnames(x), colnames(cdm$visit_occurrence))
-      x <- x |>
-        dplyr::inner_join(
-          cdm$visit_occurrence |>
-            dplyr::select(dplyr::all_of(c("visit_concept_id", col))),
-          by = col
-        )
     } else if (act[1] == "addTimeToLast") {
       nm1 <- omopgenerics::tableName(table = x)
       col1 <- omopgenerics::omopColumns(table = nm1, field = "start_date")
@@ -434,6 +446,45 @@ operation <- function(x, op) {
         dplyr::mutate(time = clock::date_count_between(
           start = .data$date1, end = .data$date2, precision = "day"
         ))
+    } else if (act[1] == "add3DigitZip") {
+      x <- x |>
+        dplyr::inner_join(
+          cdm$location |>
+            dplyr::filter(!is.na(.data$zip)) |>
+            dplyr::mutate("3_digit_zip" = stringr::str_sub(.data$zip, 1, 3)) |>
+            dplyr::select("location_id", "3_digit_zip"),
+          by = "location_id"
+        )
+    } else if (act[1] == "join") {
+      x2 <- cdm[[act[2]]]
+      col <- intersect(colnames(x), colnames(x2))
+      x <- x |>
+        dplyr::inner_join(x2, by = col)
+    } else if (act[1] == "addCost") {
+      table <- act[2]
+      domain <- omopgenerics::omopColumns(table = table, field = "domain_id")
+      uid <- omopgenerics::omopColumns(table = table, field = "unique_id")
+      con <- omopgenerics::omopColumns(table = table, field = "standard_concept")
+      x <- x |>
+        dplyr::filter(
+          !is.na(.data$paid_patient_copay) &
+            tolower(.data$cost_domain_id) == .env$domain
+        ) |>
+        dplyr::inner_join(
+          cdm[[table]] |>
+            dplyr::select(dplyr::all_of(c(con, "cost_event_id" = uid))),
+          by = "cost_event_id"
+        )
+    } else if (act[1] == "addMeasurementRange") {
+      x <- x |>
+        dplyr::mutate(measurement_range = dplyr::case_when(
+          is.na(.data$value_as_number) ~ "Other",
+          .data$value_as_number < .data$range_low ~ "Below Range Low",
+          .data$value_as_number > .data$range_high ~ "Above Range High",
+          .data$value_as_number >= .data$range_low & .data$value_as_number <= .data$range_high ~ "Within Range"
+        ))
+    } else {
+      cli::cli_abort(c(x = "Not configured analysis"))
     }
   }
   x

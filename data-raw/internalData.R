@@ -14,11 +14,23 @@ achillesAnalisisDetails <- readr::read_csv(
   )) |>
   dplyr::relocate("is_minimal", .before = "category") |>
   # issue 790 Achilles
-  dplyr::mutate(stratum_1_name = dplyr::case_when(
-    .data$analysis_id == 226 ~ "visit_concept_id",
-    .data$analysis_id == 827 ~ "unit_concept_id",
-    .default = .data$stratum_1_name
-  ))
+  dplyr::mutate(
+    stratum_1_name = dplyr::case_when(
+      .data$analysis_id == 226 ~ "visit_concept_id",
+      .data$analysis_id == 827 ~ "unit_concept_id",
+      .data$analysis_id == 1827 ~ "unit_concept_id",
+      .data$analysis_id %in% c(1815, 1816, 1817, 1818) ~ "measurement_concept_id",
+      .default = .data$stratum_1_name
+    ),
+    stratum_2_name = dplyr::case_when(
+      .data$analysis_id %in% c(1815, 1816, 1817, 1818) ~ "unit_concept_id",
+      .default = .data$stratum_2_name
+    ),
+    stratum_3_name = dplyr::case_when(
+      .data$analysis_id == 1818 ~ "measurement_range",
+      .default = .data$stratum_3_name
+    )
+  )
 
 extraDetails <- readr::read_csv(
   file = here::here("data-raw", "achilles_analysis_extra_details.csv"),

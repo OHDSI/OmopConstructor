@@ -11,13 +11,13 @@ analysis_id,type,table,operation
 10,count record,person,
 11,count record,person,remove death person_id
 12,count record,person,
-101,count person_id,observation_period,first;addAge
-102,count person_id,observation_period,first;addGenderConceptId;addAge
-103,distribution age,observation_period,first;addAge
-104,distribution age,observation_period,first;addGenderConceptId;addAge
+101,count person_id,observation_period,first;addDemo
+102,count person_id,observation_period,first;addDemo gender
+103,distribution age,observation_period,first;addDemo
+104,distribution age,observation_period,first;addDemo gender
 105,distribution duration,observation_period,first;addDuration
-106,distribution duration,observation_period,first;addGenderConceptId;addDuration
-107,distribution duration,observation_period,first;addDuration;addAgeDecile
+106,distribution duration,observation_period,first;join person;addDuration
+107,distribution duration,observation_period,first;addDuration;addDemo decile
 108,count person_id,observation_period,addDuration30d observation_period_length_30d_increments
 109,count person_id,observation_period,addPeriod year full
 110,count person_id,observation_period,addPeriod month full
@@ -26,7 +26,7 @@ analysis_id,type,table,operation
 113,count person_id,person,addCount observation_period record number_of_observation_periods
 114,count person_id,observation_period,removeRecordsAfterBirth
 115,count person_id,observation_period,removeEndAfterStart
-116,count person_id,observation_period,addGenderConceptId;addAgeDecile;addPeriod year one
+116,count person_id,observation_period,addDemo gender decile;addPeriod year one
 117,count person_id,observation_period,addPeriod month one
 118,count record,observation_period,remove person person_id
 119,count record,observation_period,
@@ -34,13 +34,13 @@ analysis_id,type,table,operation
 201,count record,visit_occurrence,
 202,count person_id,visit_occurrence,addDate start month
 203,distribution number_visit_occurrences,person,addCount visit_occurrence record number_visit_occurrences
-204,count person_id,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
-206,distribution age,visit_occurrence,addGenderConceptId;addAge
+204,count person_id,visit_occurrence,addDemo gender decile;addDate start year
+206,distribution age,visit_occurrence,addDemo gender
 207,count record,visit_occurrence,remove person person_id
 209,count record,visit_occurrence,remove care_site care_site_id
 210,count record,visit_occurrence,observation start no
 211,count record,visit_occurrence,removeEndAfterStart
-212,count person_id,visit_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+212,count person_id,visit_occurrence,addDemo gender decile;addDate start year
 213,distribution duration,visit_occurrence,addDuration
 220,count record,visit_occurrence,addDate start month
 221,count person_id,visit_occurrence,addDate start year
@@ -51,15 +51,15 @@ analysis_id,type,table,operation
 232,proportion person_id,visit_occurrence,observation start no
 300,count provider_id,provider,
 301,count provider_id,provider,
-303,count record,provider,addVisitConceptId
+303,count record,provider,join visit_occurrence
 325,count record,provider,
 400,count person_id,condition_occurrence,
 401,count record,condition_occurrence,
 402,count person_id,condition_occurrence,addDate start month
 403,distribution number_concepts,person,addCount condition_occurrence condition_concept_id number_concepts
-404,count person_id,condition_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+404,count person_id,condition_occurrence,addDemo gender decile;addDate start year
 405,count record,condition_occurrence,
-406,distribution age,condition_occurrence,addAge;addGenderConceptId
+406,distribution age,condition_occurrence,addDemo gender
 409,count record,condition_occurrence,remove person person_id
 410,count record,condition_occurrence,observation start no
 411,count record,condition_occurrence,removeEndAfterStart
@@ -77,9 +77,9 @@ analysis_id,type,table,operation
 500,count person_id,death,
 501,count record,death,
 502,count person_id,death,addDate start month
-504,count person_id,death,addGenderConceptId;addAgeDecile;addDate start year
+504,count person_id,death,addDemo gender decile;addDate start year
 505,count record,death,
-506,distribution age,death,addGenderConceptId;addAge
+506,distribution age,death,addDemo gender
 509,count record,death,remove person person_id
 510,count person_id,death,observation start no
 511,distribution time,death,addTimeToLast condition_occurrence
@@ -95,9 +95,9 @@ analysis_id,type,table,operation
 601,count record,procedure_occurrence,
 602,count person_id,procedure_occurrence,addDate start month
 603,distribution number_concepts,person,addCount procedure_occurrence procedure_concept_id number_concepts
-604,count person_id,procedure_occurrence,addGenderConceptId;addAgeDecile;addDate start year
+604,count person_id,procedure_occurrence,addDemo gender decile;addDate start year
 605,count record,procedure_occurrence,
-606,distribution age,procedure_occurrence,addGenderConceptId;addAge
+606,distribution age,procedure_occurrence,addDemo gender
 609,count record,procedure_occurrence,remove person person_id
 610,count record,procedure_occurrence,observation start no
 612,count record,procedure_occurrence,remove provider provider_id
@@ -113,9 +113,9 @@ analysis_id,type,table,operation
 701,count record,drug_exposure,
 702,count person_id,drug_exposure,addDate start month
 703,distribution number_concepts,person,addCount drug_exposure drug_concept_id number_concepts
-704,count person_id,drug_exposure,addGenderConceptId;addAgeDecile;addDate start year
+704,count person_id,drug_exposure,addDemo gender decile;addDate start year
 705,count record,drug_exposure,
-706,distribution age,drug_exposure,addGenderConceptId;addAge
+706,distribution age,drug_exposure,addDemo gender
 709,count record,drug_exposure,remove person person_id
 710,count record,drug_exposure,observation start no
 711,count record,drug_exposure,removeEndAfterStart
@@ -135,9 +135,9 @@ analysis_id,type,table,operation
 801,count record,observation,
 802,count person_id,observation,addDate start month
 803,distribution number_concepts,person,addCount observation observation_concept_id number_concepts
-804,count person_id,observation,addGenderConceptId;addAgeDecile;addDate start year
+804,count person_id,observation,addDemo gender decile;addDate start year
 805,count record,observation,
-806,distribution age,observation,addGenderConceptId;addAge
+806,distribution age,observation,addDemo gender
 807,count record,observation,
 809,count record,observation,remove person person_id
 810,count record,observation,observation start no
@@ -160,13 +160,127 @@ analysis_id,type,table,operation
 901,count record,drug_era,
 902,count person_id,drug_era,addDate start month
 903,distribution number_concepts,person,addCount drug_era drug_concept_id number_concepts
-904,count person_id,drug_era,addGenderConceptId;addAgeDecile;addDate start year
-906,distribution age,drug_era,addGenderConceptId;addAge
+904,count person_id,drug_era,addDemo gender decile;addDate start year
+906,distribution age,drug_era,addDemo gender
 907,count record,drug_era,
 908,count record,drug_era,remove person person_id
-910,count record,drug_era,drug_era start no
+910,count record,drug_era,observation start no
 911,count record,drug_exposure,removeEndAfterStart
 920,count record,drug_era,addDate start month
-930,count record,drug_era,drug_era start yes
-931,proportion person_id,drug_era,drug_era start no
-932,proportion record,drug_era,drug_era start no
+930,count record,drug_era,observation start yes
+931,proportion person_id,drug_era,observation start no
+932,proportion record,drug_era,observation start no
+1000,count person_id,condition_era,
+1001,count record,condition_era,
+1002,count person_id,condition_era,addDate start month
+1003,distribution number_concepts,person,addCount condition_era condition_concept_id number_concepts
+1004,count person_id,condition_era,addDemo gender decile;addDate start year
+1006,distribution age,condition_era,addDemo gender
+1007,count record,condition_era,
+1008,count record,condition_era,remove person person_id
+1010,count record,condition_era,observation start no
+1011,count record,drug_exposure,removeEndAfterStart
+1020,count record,drug_era,addDate start month
+1030,count record,drug_era,observation start yes
+1031,proportion person_id,drug_era,observation start no
+1032,proportion record,drug_era,observation start no
+1100,count record,person,add3DigitZip
+1101,count record,person,join location
+1102,count record,person,add3DigitZip
+1103,count record,person,join location
+1200,count record,person,join care_site
+1201,count record,care_site,join visit_occurrence
+1202,count record,care_site,
+1203,count record,care_site,join visit_occurrence
+1300,count person_id,visit_detail,
+1301,count record,visit_detail,
+1302,count person_id,visit_detail,addDate start month
+1303,distribution number_concepts,person,addCount visit_detail visit_detail_concept_id number_concepts
+1304,count person_id,visit_detail,addDemo gender decile;addDate start year
+1306,distribution age,visit_detail,addDemo gender
+1307,count record,visit_detail,
+1309,count record,visit_detail,remove person person_id
+1310,count record,visit_detail,observation start no
+1311,count record,visit_detail,removeEndAfterStart
+1312,count person_id,visit_detail,addDemo gender decile;addDate start year
+1313,count record,visit_detail,remove visit_occurrence visit_occurrence_id
+1320,count record,visit_detail,addDate start month
+1321,count record,visit_detail,addDate start year
+1325,count record,visit_detail,
+1326,count record,visit_detail,addCdmTable
+1330,count record,visit_detail,observation start yes
+1331,proportion person_id,visit_detail,observation start no
+1332,proportion record,visit_detail,observation start no
+1406,distribution duration,payer_plan_period,first;addDuration;join person
+1407,distribution duration,payer_plan_period,first;addDemo decile;addDuration
+1408,count person_id,payer_plan_period,addDuration30d payer_plan_period_length_30d_increments
+1409,count person_id,payer_plan_period,addPeriod year full
+1410,count person_id,payer_plan_period,addPeriod month full
+1411,count person_id,payer_plan_period,addDate start month
+1412,count person_id,payer_plan_period,addDate end month
+1413,count person_id,person,addCount payer_plan_period record number_of_payer_plan_periods
+1414,count person_id,payer_plan_period,removeRecordsAfterBirth
+1415,count person_id,payer_plan_period,removeEndAfterStart
+1425,count record,payer_plan_period,
+1502,distribution paid_patient_copay,cost,addCost drug_exposure
+1503,distribution paid_patient_coinsurance,cost,addCost drug_exposure
+1504,distribution paid_patient_deductible,cost,addCost drug_exposure
+1505,distribution paid_by_payer,cost,addCost drug_exposure
+1506,distribution paid_by_primary,cost,addCost drug_exposure
+1507,distribution paid_by_patient,cost,addCost drug_exposure
+1508,distribution total_paid,cost,addCost drug_exposure
+1509,distribution paid_ingredient_cost,cost,addCost drug_exposure
+1510,distribution paid_dispensing_fee,cost,addCost drug_exposure
+1511,distribution total_cost,cost,addCost drug_exposure
+1602,distribution paid_patient_copay,cost,addCost procedure_occurrence
+1603,distribution paid_patient_coinsurance,cost,addCost procedure_occurrence
+1604,distribution paid_patient_deductible,cost,addCost procedure_occurrence
+1605,distribution paid_by_payer,cost,addCost procedure_occurrence
+1606,distribution paid_by_primary,cost,addCost procedure_occurrence
+1607,distribution paid_by_patient,cost,addCost procedure_occurrence
+1608,distribution total_paid,cost,addCost procedure_occurrence
+1610,count record,cost,
+1800,count person_id,measurement,
+1801,count record,measurement,
+1802,count person_id,measurement,addDate start month
+1803,distribution number_concepts,person,addCount measurement measurement_concept_id number_concepts
+1804,count person_id,measurement,addDemo gender decile;addDate start year
+1805,count record,measurement,
+1806,distribution age,measurement,addDemo gender
+1807,count record,measurement,
+1809,count record,measurement,remove person person_id
+1810,count record,measurement,observation start no
+1812,count record,measurement,remove provider provider_id
+1813,count record,measurement,remove visit_occurrence visit_occurrence_id
+1814,noValue,measurement,
+1815,distribution value_as_number,measurement,
+1816,distribution range_low,measurement,
+1817,distribution range_high,measurement,
+1818,count record,measurement,addMeasurementRange
+1820,count record,measurement,addDate start month
+1822,count record,measurement,
+1823,count record,measurement,
+1824,coocurrent standard_concept,measurement,
+1825,count record,measurement,
+1826,count record,measurement,
+1827,count record,measurement,
+1830,count record,measurement,observation start yes
+1831,proportion person_id,measurement,observation start no
+1832,proportion record,measurement,observation start no
+1891,conceptDistribution,measurement,
+2100,count person_id,device_exposure,
+2101,count record,device_exposure,
+2102,count person_id,device_exposure,addDate start month
+2103,distribution number_concepts,person,addCount device_exposure device_concept_id number_concepts
+2104,count person_id,device_exposure,addDemo gender decile;addDate start year
+2105,count record,device_exposure,
+2106,distribution age,device_exposure,addDemo gender
+2110,count record,device_exposure,observation start no
+2120,count record,device_exposure,addDate start month
+2125,count record,device_exposure,
+2130,count record,device_exposure,observation start yes
+2131,proportion person_id,device_exposure,observation start no
+2132,proportion record,device_exposure,observation start no
+2191,conceptDistribution,device_exposure,
+2200,count person_id,note,
+2201,count record,note,

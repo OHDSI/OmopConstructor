@@ -17,13 +17,14 @@ achillesAnalisisDetails <- readr::read_csv(
   dplyr::mutate(
     stratum_1_name = dplyr::case_when(
       .data$analysis_id == 226 ~ "visit_concept_id",
+      .data$analysis_id == 815 ~ "observation_concept_id",
       .data$analysis_id == 827 ~ "unit_concept_id",
-      .data$analysis_id == 1827 ~ "unit_concept_id",
       .data$analysis_id %in% c(1815, 1816, 1817, 1818) ~ "measurement_concept_id",
+      .data$analysis_id == 1827 ~ "unit_concept_id",
       .default = .data$stratum_1_name
     ),
     stratum_2_name = dplyr::case_when(
-      .data$analysis_id %in% c(1815, 1816, 1817, 1818) ~ "unit_concept_id",
+      .data$analysis_id %in% c(815, 1815, 1816, 1817, 1818) ~ "unit_concept_id",
       .default = .data$stratum_2_name
     ),
     stratum_3_name = dplyr::case_when(

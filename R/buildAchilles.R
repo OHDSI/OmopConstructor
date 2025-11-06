@@ -30,9 +30,7 @@ buildAchilles <- function(cdm,
       dplyr::pull("analysis_name")
     kk <- sprintf("%i", k) |>
       stringr::str_pad(width = nchar(len), pad = " ")
-    ei <- sprintf("%i", id) |>
-      stringr::str_pad(width = 4, pad = " ")
-    cli::cli_inform(c("i" = "{kk} of {len}: {.emph ID-{ei}} {.pkg {nm}}."))
+    cli::cli_inform(c("i" = "{kk} of {len}: {.pkg {nm}} (achilles ID = {id})."))
     cdm <- appendAchillesId(cdm, id)
   }
 
@@ -222,11 +220,13 @@ operation <- function(x, op) {
         dplyr::filter(!is.na(.data[[col]])) |>
         dplyr::anti_join(cdm[[table]], by = col)
     } else if (act[1] == "first") {
-      col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
-      x <- x |>
-        dplyr::group_by(.data$person_id) |>
-        dplyr::filter(.data[[col]] == min(.data[[col]], na.rm = TRUE)) |>
-        dplyr::ungroup()
+      if (!omopgenerics::isTableEmpty(table = x)) {
+        col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
+        x <- x |>
+          dplyr::group_by(.data$person_id) |>
+          dplyr::filter(.data[[col]] == min(.data[[col]], na.rm = TRUE)) |>
+          dplyr::ungroup()
+      }
     } else if (act[1] == "addDemo") {
       col <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
       gender <- "gender" %in% act
@@ -577,7 +577,8 @@ counts <- function(x, by, count) {
 distribution <- function(x, by, value) {
   x <- x |>
     dplyr::select(dplyr::all_of(c(by, value = value))) |>
-    dplyr::collect()
+    dplyr::collect() |>
+    dplyr::filter(!is.na(.data$value))
   n <- as.integer(nrow(x))
   if (n == 0L) {
     dplyr::tibble(
@@ -593,19 +594,20 @@ distribution <- function(x, by, value) {
       p90_value = NA_real_
     )
   } else {
-    dplyr::summarise(
-      x,
-      count_value = .env$n,
-      min_value = as.integer(min(.data$value, na.rm = TRUE)),
-      max_value = as.integer(max(.data$value, na.rm = TRUE)),
-      avg_value = as.numeric(mean(.data$value, na.rm = TRUE)),
-      stdev_value = as.numeric(sd(.data$value, na.rm = TRUE)),
-      median_value = as.numeric(median(.data$value, na.rm = TRUE)),
-      p10_value = as.numeric(quantile(.data$value, probs = 0.10, na.rm = TRUE)),
-      p25_value = as.numeric(quantile(.data$value, probs = 0.25, na.rm = TRUE)),
-      p75_value = as.numeric(quantile(.data$value, probs = 0.75, na.rm = TRUE)),
-      p90_value = as.numeric(quantile(.data$value, probs = 0.90, na.rm = TRUE))
-    )
+    x |>
+      dplyr::group_by(dplyr::across(dplyr::all_of(names(by)))) |>
+      dplyr::summarise(
+        count_value = .env$n,
+        min_value = as.integer(min(.data$value, na.rm = TRUE)),
+        max_value = as.integer(max(.data$value, na.rm = TRUE)),
+        avg_value = as.numeric(mean(.data$value, na.rm = TRUE)),
+        stdev_value = as.numeric(sd(.data$value, na.rm = TRUE)),
+        median_value = as.numeric(median(.data$value, na.rm = TRUE)),
+        p10_value = as.numeric(quantile(.data$value, probs = 0.10, na.rm = TRUE)),
+        p25_value = as.numeric(quantile(.data$value, probs = 0.25, na.rm = TRUE)),
+        p75_value = as.numeric(quantile(.data$value, probs = 0.75, na.rm = TRUE)),
+        p90_value = as.numeric(quantile(.data$value, probs = 0.90, na.rm = TRUE))
+      )
   }
 }
 proportion <- function(x, count, den, by) {
@@ -771,9 +773,9 @@ appendAchillesAnalysis <- function(cdm, achillesId) {
     table = achillesAnalisisDetails |>
       dplyr::filter(.data$analysis_id %in% .env$achillesId) |>
       dplyr::select(
-        "analysis_id", "distribution", "distributed_field", "analysis_name",
-        "stratum_1_name", "stratum_2_name", "stratum_3_name", "stratum_4_name",
-        "stratum_5_name", "is_default", "category"
+        "analysis_id", "analysis_name", "stratum_1_name", "stratum_2_name",
+        "stratum_3_name", "stratum_4_name", "stratum_5_name", "is_default",
+        "category"
       )
   )
 

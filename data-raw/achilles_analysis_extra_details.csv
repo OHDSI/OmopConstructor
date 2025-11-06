@@ -162,7 +162,7 @@ analysis_id,type,table,operation
 903,distribution number_concepts,person,addCount drug_era drug_concept_id number_concepts
 904,count person_id,drug_era,addDemo gender decile;addDate start year
 906,distribution age,drug_era,addDemo gender
-907,count record,drug_era,
+907,distribution duration,drug_era,addDuration
 908,count record,drug_era,remove person person_id
 910,count record,drug_era,observation start no
 911,count record,drug_exposure,removeEndAfterStart
@@ -176,7 +176,7 @@ analysis_id,type,table,operation
 1003,distribution number_concepts,person,addCount condition_era condition_concept_id number_concepts
 1004,count person_id,condition_era,addDemo gender decile;addDate start year
 1006,distribution age,condition_era,addDemo gender
-1007,count record,condition_era,
+1007,distribution duration,condition_era,addDuration
 1008,count record,condition_era,remove person person_id
 1010,count record,condition_era,observation start no
 1011,count record,drug_exposure,removeEndAfterStart
@@ -203,7 +203,7 @@ analysis_id,type,table,operation
 1310,count record,visit_detail,observation start no
 1311,count record,visit_detail,removeEndAfterStart
 1312,count person_id,visit_detail,addDemo gender decile;addDate start year
-1313,count record,visit_detail,remove visit_occurrence visit_occurrence_id
+1313,distribution duration,visit_detail,addDuration
 1320,count record,visit_detail,addDate start month
 1321,count record,visit_detail,addDate start year
 1325,count record,visit_detail,

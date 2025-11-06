@@ -334,17 +334,6 @@ operation <- function(x, op) {
             clock::get_year(x = .data[[col]]) * 100 + clock::get_month(x = .data[[col]])
           ))
       }
-    } else if (act[1] == "addNumberObservationPeriods") {
-      x <- x |>
-        dplyr::left_join(
-          cdm$observation_period |>
-            dplyr::group_by(.data$person_id) |>
-            dplyr::tally(name = "number_of_observation_periods"),
-          by = "person_id"
-        ) |>
-        dplyr::mutate(number_of_observation_periods = dplyr::coalesce(
-          as.integer(.data$number_of_observation_periods), 0L
-        ))
     } else if (act[1] == "removeRecordsAfterBirth") {
       start <- omopgenerics::omopColumns(table = omopgenerics::tableName(x), field = "start_date")
       x <- x |>

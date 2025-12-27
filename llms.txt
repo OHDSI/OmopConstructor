@@ -1,0 +1,149 @@
+# OmopConstructor
+
+**OmopConstructor** is a package that contains functionality to
+construct standardised tables from health care data formatted according
+to the Observational Medical Outcomes Partnership Common Data Model
+([OMOP CDM](https://ohdsi.github.io/CommonDataModel/)). The package
+includes tools to build key tables such as observation period and drug
+era, among others.
+
+## Tested sources
+
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-local-omopgenerics.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-local-omopgenerics.yaml)
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-duckdb-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-duckdb-CDMConnector.yaml)
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-postgres-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-postgres-CDMConnector.yaml)
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-redshift-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-redshift-CDMConnector.yaml)
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-sqlserver-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-sqlserver-CDMConnector.yaml)
+[![](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-snowflake-CDMConnector.yaml/badge.svg?branch=main)](https://github.com/OHDSI/OmopConstructor/actions/workflows/test-snowflake-CDMConnector.yaml)
+
+## Installation
+
+You can install OmopConstructor from cran using:
+
+``` r
+install.packages("OmopConstructor")
+```
+
+Or, you can install the development version of OmopConstructor from
+[GitHub](https://github.com/) with:
+
+``` r
+# install.packages("pak")
+pak::pkg_install("ohdsi/OmopConstructor")
+```
+
+## Main functionality
+
+Currently **OmopConstructor** main functionalities are:
+
+- [`buildObservationPeriod()`](https://ohdsi.github.io/OmopConstructor/reference/buildObservationPeriod.html)
+  to generate observation periods based on the data already in the `cdm`
+  object.
+
+### Building observation periods
+
+You can generate the observation period table directly from the data
+contained in the `cdm` object, which is particularly useful for creating
+custom observation periods on a study-by-study basis. In this example,
+the observation period is defined as one record per person, starting
+from the first available observation in the data and ending at the
+earliest of the following: (1) a recorded death, (2) reaching 120 years
+of age, or (3) the extraction date (here, set to 01-01-2010).
+
+``` r
+library(omock)
+library(OmopConstructor)
+
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+#> ℹ Reading GiBleed tables.
+#> ℹ Adding drug_strength table.
+#> ℹ Creating local <cdm_reference> object.
+#> ℹ Inserting <cdm_reference> into duckdb.
+
+cdm <- buildObservationPeriod(cdm = cdm,
+                              collapseDays = Inf,
+                              persistenceDays = Inf, 
+                              dateRange = as.Date(c("1900-01-01", "2010-01-01")), 
+                              censorAge = 120)
+cdm
+#> 
+#> ── # OMOP CDM reference (duckdb) of GiBleed ────────────────────────────────────
+#> • omop tables: care_site, cdm_source, concept, concept_ancestor, concept_class,
+#> concept_relationship, concept_synonym, condition_era, condition_occurrence,
+#> cost, death, device_exposure, domain, dose_era, drug_era, drug_exposure,
+#> drug_strength, fact_relationship, location, measurement, metadata, note,
+#> note_nlp, observation, observation_period, payer_plan_period, person,
+#> procedure_occurrence, provider, relationship, source_to_concept_map, specimen,
+#> visit_detail, visit_occurrence, vocabulary
+#> • cohort tables: -
+#> • achilles tables: -
+#> • other tables: -
+```
+
+We can use *OmopSketch* to visualise the characteristics of the new
+observation period table that we have built:
+
+``` r
+library(OmopSketch)
+
+result <- summariseObservationPeriod(observationPeriod = cdm$observation_period)
+
+tableObservationPeriod(result = result, type = "flextable")
+```
+
+![](reference/figures/README-unnamed-chunk-5-1.png)
+
+## Running
+
+Configure a `.env` configuration file using the `example.env` example
+settings file. Supply your JDBC driver and place it in the `drivers`
+directory.
+
+``` R
+docker build . -t omop-constructor
+
+docker run --rm --env-file=".env" --network="host" omop-constructor
+```
+
+After successful execution the `observation_period` will have been
+truncated and recalculated.
+
+# Package index
+
+### Build the observation period table
+
+Build custom observation period tables study-by-study basis using data
+already present in your `cdm` object.
+
+- [`buildObservationPeriod()`](https://OHDSI.github.io/OmopConstructor/reference/buildObservationPeriod.md)
+  :
+
+  Build `observation_period` table from data recorded in the
+  `cdm_reference`
+
+### Build the drug era table
+
+Build the drug era table. You can also customise the drug era table to a
+desired collapseDays to build eras your own way.
+
+- [`buildDrugEra()`](https://OHDSI.github.io/OmopConstructor/reference/buildDrugEra.md)
+  :
+
+  Build the `drug_era` table
+
+### Utility functions
+
+Block of functions used inside the main functions, that can be useful
+for other packages.
+
+- [`collapseRecords()`](https://OHDSI.github.io/OmopConstructor/reference/collapseRecords.md)
+  :
+
+  Collapse records of a `cdm_table` into episodes.
+
+# Articles
+
+### All vignettes
+
+- [Generating the Observation Period
+  Table](https://OHDSI.github.io/OmopConstructor/articles/buildObservationPeriod.md):

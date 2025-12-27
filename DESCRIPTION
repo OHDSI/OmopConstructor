@@ -30,8 +30,7 @@ Imports:
     omopgenerics,
     PatientProfiles,
     purrr,
-    rlang,
-    tidyr
+    rlang
 Depends: 
     R (>= 4.1)
 Suggests: 
@@ -48,6 +47,7 @@ Suggests:
     RPostgres,
     stringr,
     testthat (>= 3.0.0),
+    tidyr,
     visOmopResults
 Config/testthat/edition: 3
 URL: https://ohdsi.github.io/OmopConstructor/

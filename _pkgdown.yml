@@ -7,6 +7,10 @@ reference:
   desc: Build custom observation period tables study-by-study basis using data already present in your `cdm` object.
 - contents:
   - buildObservationPeriod
+- subtitle: Build the Achilles tables
+  desc: Build achilles tables
+- contents:
+  - buildAchilles
 - subtitle: Build the drug era table
   desc: Build the drug era table. You can also customise the drug era table to a desired collapseDays to build eras your own way.
 - contents:

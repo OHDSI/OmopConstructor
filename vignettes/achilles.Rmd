@@ -1,0 +1,104 @@
+---
+title: "Achilles tables"
+output: 
+  bookdown::html_document2:
+    number_sections: true
+    toc: true
+    pandoc_args: ["--number-offset=1,0"]
+vignette: >
+  %\VignetteIndexEntry{Achilles tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+```{r, echo=FALSE, message=FALSE}
+library(dplyr)
+library(gt)
+x <- OmopConstructor:::achillesAnalisisDetails |>
+  mutate(Group = paste0(
+    if_else(is_minimal, "minimal; ", ""),
+    if_else(is_default, "default; ", ""),
+    tolower(category)
+  )) |>
+  select(
+    "ID" = "analysis_id", "Name" = "analysis_name", "1" = "stratum_1_name",
+    "2" = "stratum_2_name", "3" = "stratum_3_name", "4" = "stratum_4_name",
+    "5" = "stratum_5_name", "Group", "category"
+  ) |>
+  mutate(across(c("1", "2", "3", "4", "5"), \(x) coalesce(x, "-")))
+xt <- x |>
+  inner_join(
+    x |>
+      group_by(category) |>
+      summarise(min = min(ID)),
+    by = "category"
+  ) |>
+  arrange(min) |>
+  select(!"min") |>
+  group_by(category) |>
+  gt() |>
+  tab_spanner(label = "Analysis", columns = c("ID", "Name")) |>
+  tab_spanner(label = "Stratum", columns = c("1", "2", "3", "4", "5")) |>
+  tab_style(
+    style = cell_text(align = "center", weight = "bold"),
+    locations = cells_column_labels()
+  ) |>
+  tab_style(
+    style = cell_text(align = "center", weight = "bold"),
+    locations = cells_column_spanners()
+  ) |>
+  tab_style(
+    style = cell_fill(color = "blue", alpha = 0.1),
+    locations = cells_body(columns = c("ID", "Name"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "blue", alpha = 0.5),
+    locations = cells_column_labels(columns = c("ID", "Name"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "blue", alpha = 0.5),
+    locations = cells_column_spanners(spanners = c("Analysis"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "red", alpha = 0.1),
+    locations = cells_body(columns = c("1", "2", "3", "4", "5"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "red", alpha = 0.5),
+    locations = cells_column_labels(columns = c("1", "2", "3", "4", "5"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "red", alpha = 0.5),
+    locations = cells_column_spanners(spanners = "Stratum")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "green", alpha = 0.1),
+    locations = cells_body(columns = c("Group"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "green", alpha = 0.5),
+    locations = cells_column_labels(columns = c("Group"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "grey", alpha = 0.1),
+    locations = cells_row_groups()
+  ) 
+```
+
+
+The [`Achilles`](https://ohdsi.github.io/Achilles/) R package is used to provide descriptive statistics of an [OMOP CDM](https://ohdsi.github.io/CommonDataModel/) database. There exist a total of `r nrow(x)` analyses, classified into 21 categories: `r paste0("*", unique(OmopConstructor:::achillesAnalisisDetails$category), "*", collapse = ", ")`.
+
+```{r, echo=FALSE}
+xt
+```
+
+## Differences with the Achilles R package

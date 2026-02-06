@@ -1,5 +1,5 @@
 test_that("test drug_era table", {
-  cdm <- omock::mockVocabularySet(vocabularySet = "empty_cdm") |>
+  cdm <- omock::mockVocabularySet(vocabularySet = "empty_cdm_5.4") |>
     omock::mockCdmFromTables(tables = list(
       drug_exposure = dplyr::tibble(
         person_id = c(1L, 1L, 1L, 1L, 2L, 2L),

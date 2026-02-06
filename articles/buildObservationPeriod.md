@@ -99,7 +99,7 @@ library(ggplot2)
 library(visOmopResults)
 
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
-#> ℹ Reading GiBleed tables.
+#> ℹ Loading bundled GiBleed tables from package data.
 #> ℹ Adding drug_strength table.
 #> ℹ Creating local <cdm_reference> object.
 #> ℹ Inserting <cdm_reference> into duckdb.
@@ -162,7 +162,7 @@ result1a <- summariseObservationPeriod(observationPeriod = cdm$observation_perio
 #> Warning: The `observationPeriod` argument of `summariseObservationPeriod()` is
 #> deprecated as of OmopSketch 0.5.1.
 #> ℹ Please use the `cdm` argument instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 #> ℹ retrieving cdm object from cdm_table.
@@ -171,7 +171,7 @@ result1b <- summariseInObservation(observationPeriod = cdm$observation_period,
                                    output = c("person-days", "age"))
 #> Warning: `summariseInObservation()` was deprecated in OmopSketch 1.0.0.
 #> ℹ Please use `summariseTrend()` instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 
@@ -397,6 +397,8 @@ plotObservationPeriod(result = result,
                       plotType = "densityplot", 
                       colour = "cdm_name") +
   ggplot2::coord_cartesian(xlim = c(NA, 40))
+#> ! Multiple values of `variable_level` detected, consider including them in
+#>   either: `x`, `facet`, `colour`, and `group`.
 ```
 
 ![](buildObservationPeriod_files/figure-html/unnamed-chunk-11-1.png)
@@ -452,7 +454,7 @@ result |>
   plotInObservation(colour = "cdm_name")
 #> Warning: `plotInObservation()` was deprecated in OmopSketch 1.0.0.
 #> ℹ Please use `plotTrend()` instead.
-#> This warning is displayed once every 8 hours.
+#> This warning is displayed once per session.
 #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
 #> generated.
 #> Warning: `result` does not contain any `summarise_trend` data.

@@ -14,7 +14,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/ohdsi/OmopConstructor/blob/main/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/ohdsi/OmopConstructor/blob/v0.2.0/DESCRIPTION)
 
 Català M (2026). *OmopConstructor: Build Tables in the OMOP Common Data
 Model*. R package version 0.2.0,

@@ -17,13 +17,13 @@ Source:
 [`DESCRIPTION`](https://github.com/ohdsi/OmopConstructor/blob/main/DESCRIPTION)
 
 Català M (2026). *OmopConstructor: Build Tables in the OMOP Common Data
-Model*. R package version 0.1.0,
+Model*. R package version 0.2.0,
 <https://ohdsi.github.io/OmopConstructor/>.
 
     @Manual{,
       title = {OmopConstructor: Build Tables in the OMOP Common Data Model},
       author = {Martí Català},
       year = {2026},
-      note = {R package version 0.1.0},
+      note = {R package version 0.2.0},
       url = {https://ohdsi.github.io/OmopConstructor/},
     }

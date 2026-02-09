@@ -39,7 +39,7 @@ buildDrugEra <- function(cdm,
       cdm$concept |>
         dplyr::filter(
           .data$vocabulary_id %in% c("RxNorm", "RxNorm Extension") &
-            .data$concept_class_id == "Ingredient" &
+            tolower(.data$concept_class_id) == "ingredient" &
             !stringr::str_like(string = .data$concept_name, pattern = "%vaccine%")
         ) |>
         dplyr::select("ingredient_concept_id" = "concept_id") |>

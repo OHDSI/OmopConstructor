@@ -12,3 +12,4 @@ example.env
 scripts
 drivers
 ^CRAN-SUBMISSION$
+^extras/

@@ -1,6 +1,6 @@
 Package: OmopConstructor
 Title: Build Tables in the OMOP Common Data Model
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person(
         "Martí", "Català", email = "marti.catalasabate@ndorms.ox.ac.uk", 

@@ -165,7 +165,7 @@ analysis_id,type,table,operation
 907,distribution duration,drug_era,addDuration
 908,count record,drug_era,remove person person_id
 910,count record,drug_era,observation start no
-911,count record,drug_exposure,removeEndAfterStart
+911,count record,drug_era,removeEndAfterStart
 920,count record,drug_era,addDate start month
 930,count record,drug_era,observation start yes
 931,proportion person_id,drug_era,observation start no
@@ -179,11 +179,11 @@ analysis_id,type,table,operation
 1007,distribution duration,condition_era,addDuration
 1008,count record,condition_era,remove person person_id
 1010,count record,condition_era,observation start no
-1011,count record,drug_exposure,removeEndAfterStart
-1020,count record,drug_era,addDate start month
-1030,count record,drug_era,observation start yes
-1031,proportion person_id,drug_era,observation start no
-1032,proportion record,drug_era,observation start no
+1011,count record,condition_era,removeEndAfterStart
+1020,count record,condition_era,addDate start month
+1030,count record,condition_era,observation start yes
+1031,proportion person_id,condition_era,observation start no
+1032,proportion record,condition_era,observation start no
 1100,count record,person,add3DigitZip
 1101,count record,person,join location
 1102,count record,person,add3DigitZip

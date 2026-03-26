@@ -2,6 +2,8 @@
 
 ## OmopConstructor 0.2.0
 
+CRAN release: 2026-02-09
+
 - Create buildDrugEra function by
   [@catalamarti](https://github.com/catalamarti) in
   [\#52](https://github.com/ohdsi/OmopConstructor/issues/52)

@@ -1,14 +1,33 @@
 
+options(java.parameters = c(
+  "--add-opens=java.base/java.nio=org.apache.arrow.memory.core,ALL-UNNAMED",
+  "--add-opens=java.base/java.nio=ALL-UNNAMED"
+))
+
 library(DatabaseConnector)
 library(CDMConnector)
 library(OmopConstructor)
+
 
 # path to drivers
 pathToDriver <- file.path(getwd(), "drivers")
 dir.create(path = pathToDriver)
 
+Sys.setenv("DATABASECONNECTOR_JAR_FOLDER" = pathToDriver)
+
+
 dbms <- Sys.getenv("DBMS")
-if (dbms %in% c("postgresql", "redshift", "sql server", "oracle", "pdw", "snowflake", "spark", "bigquery", "iris")) {
+if (dbms == "snowflake") {
+  downloadJdbcDrivers(dbms = dbms, pathToDriver = pathToDriver)
+  connectionDetails <- DatabaseConnector::createConnectionDetails(
+    dbms = "snowflake",
+    connectionString = Sys.getenv("SNOWFLAKE_CONNECTION_STRING"),
+    user = Sys.getenv("DB_USER"),
+    password = Sys.getenv("DB_PASSWORD"),
+    pathToDriver = pathToDriver
+  )
+  con <- connect(connectionDetails = connectionDetails)
+} else if (dbms %in% c("postgresql", "redshift", "sql server", "oracle", "pdw", "spark", "bigquery", "iris")) {
   downloadJdbcDrivers(dbms = dbms, pathToDriver = pathToDriver)
   connectionDetails <- createConnectionDetails(
     dbms = dbms,

@@ -41,7 +41,7 @@ runAchilles <- function(id) {
 
   # run analysis using omopconstructor package
   cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb") |>
-    buildAchilles(achillesId = id)
+    buildAchillesTables(achillesId = id)
 
   # read omopconstructor package result
   result$omopconstructor <- cdm[[table]] |>

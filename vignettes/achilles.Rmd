@@ -103,7 +103,7 @@ xt
 
 ## Run achilles analysis
 
-You can create the Achilles tables using the function `buildAchilles()`. The achilles tables (`achilles_results`, `achilles_results_dist`, `achilles_analysis`) will be created in the write schema of your cdm object. You can choose what Achilles analyses to run using the `achillesId` argument providing a list of ids or a 'group' to identify several ids:
+You can create the Achilles tables using the function `buildAchillesTables()`. The achilles tables (`achilles_results`, `achilles_results_dist`, `achilles_analysis`) will be created in the write schema of your cdm object. You can choose what Achilles analyses to run using the `achillesId` argument providing a list of ids or a 'group' to identify several ids:
 
 - `'all'` to run all the analyses.
 - `'default'` to run the default Achilles analyses.
@@ -118,7 +118,7 @@ library(OmopConstructor)
 cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
 cdm
 
-cdm <- buildAchilles(cdm = cdm, achillesId = "minimal")
+cdm <- buildAchillesTables(cdm = cdm, achillesId = "minimal")
 cdm
 
 cdm$achilles_results
@@ -126,7 +126,7 @@ cdm$achilles_results
 
 ## Differences with the Achilles R package
 
-`OmopConstructor::buildAchilles()` and `OHDSI/Achilles::achilles()` both populate the same
+`OmopConstructor::buildAchillesTables()` and `OHDSI/Achilles::achilles()` both populate the same
 three output tables (`achilles_results`, `achilles_results_dist`, `achilles_analysis`) against
 an OMOP CDM database, but they follow fundamentally different design principles:
 
@@ -153,7 +153,7 @@ specified threshold is suppressed before being written to `achilles_results`, su
 privacy-preserving characterisation out of the box.
 
 **OmopConstructor** has no equivalent parameter. Suppression is not implemented at the
-`buildAchilles()` layer as results don't leave the database. When retrieving data from the achilles tables tha packages apply their own min cell count suppression that cna be customised at every step.
+`buildAchillesTables()` layer as results don't leave the database. When retrieving data from the achilles tables tha packages apply their own min cell count suppression that cna be customised at every step.
 
 ### Observation Period Consistency
 

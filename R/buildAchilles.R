@@ -9,7 +9,7 @@
 #' @return The cdm_reference object with the achilles tables populated.
 #' @export
 #'
-buildAchilles <- function(cdm,
+buildAchillesTables <- function(cdm,
                           achillesId = NULL) {
   # initial check
   cdm <- omopgenerics::validateCdmArgument(cdm = cdm)

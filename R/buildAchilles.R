@@ -289,7 +289,7 @@ operation <- function(x, op) {
         } else if (act[2] == "month") {
           y <- tidyr::expand_grid(year = startYear:endYear, month = 1:12) |>
             dplyr::mutate(
-              calendar_month = as.integer(year * 100 + month),
+              calendar_month = as.integer(.data$year * 100 + .data$month),
               start_date = as.Date(sprintf("%i-%02i-01", .data$year, .data$month)),
               end_date = as.Date(clock::add_days(clock::add_months(.data$start_date, 1), -1))
             ) |>
@@ -601,12 +601,12 @@ distribution <- function(x, by, value) {
         min_value = as.integer(min(.data$value, na.rm = TRUE)),
         max_value = as.integer(max(.data$value, na.rm = TRUE)),
         avg_value = as.numeric(mean(.data$value, na.rm = TRUE)),
-        stdev_value = as.numeric(sd(.data$value, na.rm = TRUE)),
-        median_value = as.numeric(median(.data$value, na.rm = TRUE)),
-        p10_value = as.numeric(quantile(.data$value, probs = 0.10, na.rm = TRUE)),
-        p25_value = as.numeric(quantile(.data$value, probs = 0.25, na.rm = TRUE)),
-        p75_value = as.numeric(quantile(.data$value, probs = 0.75, na.rm = TRUE)),
-        p90_value = as.numeric(quantile(.data$value, probs = 0.90, na.rm = TRUE))
+        stdev_value = as.numeric(stats::sd(.data$value, na.rm = TRUE)),
+        median_value = as.numeric(stats::median(.data$value, na.rm = TRUE)),
+        p10_value = as.numeric(stats::quantile(.data$value, probs = 0.10, na.rm = TRUE)),
+        p25_value = as.numeric(stats::quantile(.data$value, probs = 0.25, na.rm = TRUE)),
+        p75_value = as.numeric(stats::quantile(.data$value, probs = 0.75, na.rm = TRUE)),
+        p90_value = as.numeric(stats::quantile(.data$value, probs = 0.90, na.rm = TRUE))
       )
   }
 }

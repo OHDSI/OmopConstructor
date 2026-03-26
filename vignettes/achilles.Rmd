@@ -18,9 +18,9 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Introduction
+## Introduction
 
-```{r, echo=FALSE, message=FALSE}
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(gt)
 x <- OmopConstructor:::achillesAnalisisDetails |>
@@ -57,39 +57,39 @@ xt <- x |>
     locations = cells_column_spanners()
   ) |>
   tab_style(
-    style = cell_fill(color = "blue", alpha = 0.1),
+    style = cell_fill(color = "#4E6D8C", alpha = 0.1),
     locations = cells_body(columns = c("ID", "Name"))
   ) |>
   tab_style(
-    style = cell_fill(color = "blue", alpha = 0.5),
+    style = cell_fill(color = "#4E6D8C", alpha = 0.5),
     locations = cells_column_labels(columns = c("ID", "Name"))
   ) |>
   tab_style(
-    style = cell_fill(color = "blue", alpha = 0.5),
+    style = cell_fill(color = "#4E6D8C", alpha = 0.5),
     locations = cells_column_spanners(spanners = c("Analysis"))
   ) |>
   tab_style(
-    style = cell_fill(color = "red", alpha = 0.1),
+    style = cell_fill(color = "#2A9D8F", alpha = 0.1),
     locations = cells_body(columns = c("1", "2", "3", "4", "5"))
   ) |>
   tab_style(
-    style = cell_fill(color = "red", alpha = 0.5),
+    style = cell_fill(color = "#2A9D8F", alpha = 0.5),
     locations = cells_column_labels(columns = c("1", "2", "3", "4", "5"))
   ) |>
   tab_style(
-    style = cell_fill(color = "red", alpha = 0.5),
+    style = cell_fill(color = "#2A9D8F", alpha = 0.5),
     locations = cells_column_spanners(spanners = "Stratum")
   ) |>
   tab_style(
-    style = cell_fill(color = "green", alpha = 0.1),
+    style = cell_fill(color = "#E9C46A", alpha = 0.1),
     locations = cells_body(columns = c("Group"))
   ) |>
   tab_style(
-    style = cell_fill(color = "green", alpha = 0.5),
+    style = cell_fill(color = "#E9C46A", alpha = 0.5),
     locations = cells_column_labels(columns = c("Group"))
   ) |>
   tab_style(
-    style = cell_fill(color = "grey", alpha = 0.1),
+    style = cell_fill(color = "#D1D5DB", alpha = 0.1),
     locations = cells_row_groups()
   ) 
 ```
@@ -100,5 +100,20 @@ The [`Achilles`](https://ohdsi.github.io/Achilles/) R package is used to provide
 ```{r, echo=FALSE}
 xt
 ```
+
+## Run achilles analysis
+
+You can create the Achilles tables using the function `buildAchilles()`. The achilles tables (`x`) will be created in the write schema of your cdm object. You can choose what Achilles analyses to run using the `achillesId` argument providing a list of ids or a 'group' to identify several ids:
+
+- `'all'` to run all the analyses.
+- `'default'` to run the default Achilles analyses.
+- `'minimal'` to run a subset of Achilles analyses that contains the concept counts of each table, used by packages like [CodelistGenerator](https://darwin-eu.github.io/CodelistGenerator/) to find concept counts quickly.
+
+Here you can see how we run achilles analyses in the 'GiBleed' synthetic dataset:
+
+```{r}
+
+```
+
 
 ## Differences with the Achilles R package

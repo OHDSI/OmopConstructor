@@ -12,4 +12,5 @@ example.env
 scripts
 drivers
 ^CRAN-SUBMISSION$
-^extras/
+^data-raw$
+^extras$

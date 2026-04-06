@@ -1,4 +1,9 @@
 
+# OmopConstructor 0.3.0
+
+* Added working support for snowflake drivers. by @james-cockayne in #64
+* Create buildAchillesTables function by @catalamarti in #59
+
 # OmopConstructor 0.2.0
 
 * Create buildDrugEra function by @catalamarti in #52

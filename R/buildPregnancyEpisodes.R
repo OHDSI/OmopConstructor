@@ -121,6 +121,7 @@ getPregnancyEvents <- function(cdm, nms) {
     ) |>
     dplyr::mutate(type = "Obs") |>
     dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+
   if (!naIsEmpty) {
     ob <- ob |>
       dplyr::union_all(
@@ -197,13 +198,15 @@ getPregnancyEvents <- function(cdm, nms) {
       .default = as.numeric(NA)
     )) |>
     dplyr::select("person_id", "category", "gest_value", "start_date") |>
-    # exclude people who have ONLY 1 glucose test
+    # exclude people who have ONLY glucose test
     dplyr::anti_join(
       events |>
-        dplyr::filter(.data$category == "DIAB") |>
         dplyr::group_by(.data$person_id) |>
-        dplyr::summarise(n = dplyr::n()) |>
-        dplyr::filter(.data$n == 1) |>
+        dplyr::summarise(
+          n_categories = dplyr::n_distinct(.data$category),
+          has_diab = any(.data$category == "DIAB")
+        ) |>
+        dplyr::filter(.data$n_categories == 1 & .data$has_diab) |>
         dplyr::select("person_id"),
       by = "person_id"
     ) |>

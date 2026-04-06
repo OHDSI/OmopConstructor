@@ -119,19 +119,19 @@ cdm
 
 cdm$achilles_results
 #> # Source:   table<results.test_achilles_results> [?? x 7]
-#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpbvQ0IT/file1d794010353f.duckdb]
+#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpNzQoH3/file1dc4619e1815.duckdb]
 #>    analysis_id stratum_1 stratum_2 stratum_3 stratum_4 stratum_5 count_value
 #>          <int> <chr>     <chr>     <chr>     <chr>     <chr>           <int>
 #>  1         200 9201      NA        NA        NA        NA                890
 #>  2         201 9201      NA        NA        NA        NA               1037
 #>  3         225 0         NA        NA        NA        NA               1037
-#>  4         400 78272     NA        NA        NA        NA                677
-#>  5         400 80180     NA        NA        NA        NA               2694
-#>  6         400 378001    NA        NA        NA        NA                852
-#>  7         400 260139    NA        NA        NA        NA               2543
-#>  8         400 4116491   NA        NA        NA        NA                419
-#>  9         400 440448    NA        NA        NA        NA                157
-#> 10         400 4230399   NA        NA        NA        NA                132
+#>  4         400 4027663   NA        NA        NA        NA                802
+#>  5         400 4156265   NA        NA        NA        NA                459
+#>  6         400 4035415   NA        NA        NA        NA                 82
+#>  7         400 372328    NA        NA        NA        NA               2025
+#>  8         400 4278672   NA        NA        NA        NA                510
+#>  9         400 4285898   NA        NA        NA        NA                380
+#> 10         400 4266809   NA        NA        NA        NA                405
 #> # ℹ more rows
 ```
 

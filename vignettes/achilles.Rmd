@@ -1,0 +1,167 @@
+---
+title: "Achilles tables"
+output: 
+  bookdown::html_document2:
+    number_sections: true
+    toc: true
+    pandoc_args: ["--number-offset=1,0"]
+vignette: >
+  %\VignetteIndexEntry{Achilles tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## Introduction
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(gt)
+x <- OmopConstructor:::achillesAnalisisDetails |>
+  mutate(Group = paste0(
+    if_else(is_minimal, "minimal; ", ""),
+    if_else(is_default, "default; ", ""),
+    tolower(category)
+  )) |>
+  select(
+    "ID" = "analysis_id", "Name" = "analysis_name", "1" = "stratum_1_name",
+    "2" = "stratum_2_name", "3" = "stratum_3_name", "4" = "stratum_4_name",
+    "5" = "stratum_5_name", "Group", "category"
+  ) |>
+  mutate(across(c("1", "2", "3", "4", "5"), \(x) coalesce(x, "-")))
+xt <- x |>
+  inner_join(
+    x |>
+      group_by(category) |>
+      summarise(min = min(ID)),
+    by = "category"
+  ) |>
+  arrange(min) |>
+  select(!"min") |>
+  group_by(category) |>
+  gt() |>
+  tab_spanner(label = "Analysis", columns = c("ID", "Name")) |>
+  tab_spanner(label = "Stratum", columns = c("1", "2", "3", "4", "5")) |>
+  tab_style(
+    style = cell_text(align = "center", weight = "bold"),
+    locations = cells_column_labels()
+  ) |>
+  tab_style(
+    style = cell_text(align = "center", weight = "bold"),
+    locations = cells_column_spanners()
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#4E6D8C", alpha = 0.1),
+    locations = cells_body(columns = c("ID", "Name"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#4E6D8C", alpha = 0.5),
+    locations = cells_column_labels(columns = c("ID", "Name"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#4E6D8C", alpha = 0.5),
+    locations = cells_column_spanners(spanners = c("Analysis"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#2A9D8F", alpha = 0.1),
+    locations = cells_body(columns = c("1", "2", "3", "4", "5"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#2A9D8F", alpha = 0.5),
+    locations = cells_column_labels(columns = c("1", "2", "3", "4", "5"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#2A9D8F", alpha = 0.5),
+    locations = cells_column_spanners(spanners = "Stratum")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E9C46A", alpha = 0.1),
+    locations = cells_body(columns = c("Group"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#E9C46A", alpha = 0.5),
+    locations = cells_column_labels(columns = c("Group"))
+  ) |>
+  tab_style(
+    style = cell_fill(color = "#D1D5DB", alpha = 0.1),
+    locations = cells_row_groups()
+  ) 
+```
+
+
+The [`Achilles`](https://ohdsi.github.io/Achilles/) R package is used to provide descriptive statistics of an [OMOP CDM](https://ohdsi.github.io/CommonDataModel/) database. There exist a total of `r nrow(x)` analyses, classified into 21 categories: `r paste0("*", unique(OmopConstructor:::achillesAnalisisDetails$category), "*", collapse = ", ")`.
+
+```{r, echo=FALSE}
+xt
+```
+
+## Run achilles analysis
+
+You can create the Achilles tables using the function `buildAchillesTables()`. The achilles tables (`achilles_results`, `achilles_results_dist`, `achilles_analysis`) will be created in the write schema of your cdm object. You can choose what Achilles analyses to run using the `achillesId` argument providing a list of ids or a 'group' to identify several ids:
+
+- `'all'` to run all the analyses.
+- `'default'` to run the default Achilles analyses.
+- `'minimal'` to run a subset of Achilles analyses that contains the concept counts of each table, used by packages like [CodelistGenerator](https://darwin-eu.github.io/CodelistGenerator/) to find concept counts quickly.
+
+Here you can see how we run achilles analyses in the 'GiBleed' synthetic dataset:
+
+```{r}
+library(omock)
+library(OmopConstructor)
+
+cdm <- mockCdmFromDataset(datasetName = "GiBleed", source = "duckdb")
+cdm
+
+cdm <- buildAchillesTables(cdm = cdm, achillesId = "minimal")
+cdm
+
+cdm$achilles_results
+```
+
+## Differences with the Achilles R package
+
+`OmopConstructor::buildAchillesTables()` and `OHDSI/Achilles::achilles()` both populate the same
+three output tables (`achilles_results`, `achilles_results_dist`, `achilles_analysis`) against
+an OMOP CDM database, but they follow fundamentally different design principles:
+
+
+### Execution Model
+
+The most fundamental difference is *where* computation happens.
+
+**OHDSI/Achilles** is SQL-first. Every analysis is a parameterised SQL template rendered by
+`SqlRender` and executed via `DatabaseConnector` (JDBC). R is purely an orchestrator — no CDM
+data ever enters R memory. This gives Achilles broad dialect coverage (PostgreSQL, SQL Server,
+Oracle, BigQuery, Redshift, Spark, DuckDB) and keeps performance independent of R's memory
+constraints.
+
+**OmopConstructor** is R-first. Analyses are expressed as a small vocabulary of configurable
+operations (`count`, `distribution`, `proportion`, `coocurrent`, `overlap`, `conceptDistribution`)
+executed through `dplyr`/`dbplyr` against a `cdm_reference` object. The database backend is
+abstracted by `CDMConnector`/`DBI`, so no Java runtime is required.
+
+### Small Cell Suppression
+
+**OHDSI/Achilles** provides a `smallCellCount` parameter. Any result with a count below the
+specified threshold is suppressed before being written to `achilles_results`, supporting
+privacy-preserving characterisation out of the box.
+
+**OmopConstructor** has no equivalent parameter. Suppression is not implemented at the
+`buildAchillesTables()` layer as results don't leave the database. When retrieving data from the achilles tables tha packages apply their own min cell count suppression that cna be customised at every step.
+
+### Observation Period Consistency
+
+In **OHDSI/Achilles**, the observation period filter is applied inconsistently across analyses.
+Some analyses count records or persons *only within* a valid observation period; others count
+*regardless* of observation period. This inconsistency has been reported in several open issues.
+
+**OmopConstructor** makes the observation period filter an explicit, uniform operation
+(`observation start yes/no`) in the analysis configuration. Every analysis that involves an
+observation period check applies it in the same way, and analyses that do not require it simply
+omit the operation. This produces consistent behaviour across the full catalogue.

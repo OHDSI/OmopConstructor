@@ -13,3 +13,4 @@ scripts
 drivers
 ^CRAN-SUBMISSION$
 ^data-raw$
+^extras$

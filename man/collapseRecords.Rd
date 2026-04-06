@@ -4,7 +4,15 @@
 \alias{collapseRecords}
 \title{Collapse records of a \code{cdm_table} into episodes.}
 \usage{
-collapseRecords(x, startDate, endDate, by, gap = 0L, name = NULL)
+collapseRecords(
+  x,
+  startDate,
+  endDate,
+  by,
+  gap = 0L,
+  toSummarise = character(),
+  name = NULL
+)
 }
 \arguments{
 \item{x}{A \code{cdm_table} object.}
@@ -17,6 +25,9 @@ collapseRecords(x, startDate, endDate, by, gap = 0L, name = NULL)
 
 \item{gap}{Integer; distance allowed between two consecutive records to be
 collapsed.}
+
+\item{toSummarise}{Columns in x that we want to be keep, the different
+columns will be added up.}
 
 \item{name}{Name of the new \code{cdm_table} created.}
 }

@@ -11,6 +11,13 @@ already present in your `cdm` object.
   Build `observation_period` table from data recorded in the
   `cdm_reference`
 
+### Build the Achilles tables
+
+Build achilles tables
+
+- [`buildAchillesTables()`](https://OHDSI.github.io/OmopConstructor/reference/buildAchillesTables.md)
+  : Create achilles tables
+
 ### Build the drug era table
 
 Build the drug era table. You can also customise the drug era table to a

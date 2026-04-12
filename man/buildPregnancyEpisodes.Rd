@@ -2,7 +2,7 @@
 % Please edit documentation in R/buildPregnancyEpisodes.R
 \name{buildPregnancyEpisodes}
 \alias{buildPregnancyEpisodes}
-\title{Build the \code{pregnancy_episodes} extenssion table}
+\title{Build the \code{pregnancy_episodes} extension table}
 \usage{
 buildPregnancyEpisodes(cdm)
 }
@@ -13,5 +13,5 @@ buildPregnancyEpisodes(cdm)
 A cdm_reference object with the \code{pregnancy_episodes} table.
 }
 \description{
-Build the \code{pregnancy_episodes} extenssion table
+Build the \code{pregnancy_episodes} extension table
 }

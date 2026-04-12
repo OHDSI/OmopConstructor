@@ -148,6 +148,37 @@ appendValidOutcomes <- function(cdm, nms, x) {
     dplyr::compute(name = nms$valid_outcomes)
   cdm
 }
+updateEventDates <- function(x, revisions, name) {
+  x |>
+    dplyr::left_join(
+      revisions |>
+        dplyr::select("person_id", "event_id", "episode_end_date_revised"),
+      by = c("person_id", "event_id")
+    ) |>
+    dplyr::mutate(event_date = dplyr::coalesce(
+      .data$episode_end_date_revised, .data$event_date
+    )) |>
+    dplyr::select(!"episode_end_date_revised") |>
+    dplyr::compute(name = name)
+}
+getOutcomeInvalidationEvents <- function(events, firstOutcomeEvent, prefix) {
+  firstOutcomeEvent |>
+    dplyr::select("person_id", "event_id", "outcome_date" = "event_date") |>
+    dplyr::inner_join(
+      events |>
+        dplyr::filter(.data$category %in% c("AGP", "PCONF")) |>
+        dplyr::select("person_id", "event_date"),
+      by = "person_id"
+    ) |>
+    dplyr::mutate(days = clock::date_count_between(
+      start = .data$outcome_date,
+      end = .data$event_date,
+      precision = "day"
+    )) |>
+    dplyr::filter(.data$days > 0 & .data$days <= 42) |>
+    dplyr::distinct(.data$person_id, .data$event_id) |>
+    dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+}
 dropCurrentOutcomeEvents <- function(events, firstOutcomeEvent, outcomeCategory, prefix) {
   events <- events |>
     dplyr::anti_join(
@@ -536,59 +567,28 @@ populateOutcomeLoop <- function(cdm,
         dplyr::select(!"event_date") |>
         dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
 
-      cdm[[nms$pregnancy_events]] <- cdm[[nms$pregnancy_events]] |>
-        dplyr::left_join(
-          revisedOutcomeDates |>
-            dplyr::select("person_id", "event_id", "episode_end_date_revised"),
-          by = c("person_id", "event_id")
-        ) |>
-        dplyr::mutate(event_date = dplyr::coalesce(
-          .data$episode_end_date_revised, .data$event_date
-        )) |>
-        dplyr::select(!"episode_end_date_revised") |>
-        dplyr::compute(name = nms$pregnancy_events)
-
-      events <- events |>
-        dplyr::left_join(
-          revisedOutcomeDates |>
-            dplyr::select("person_id", "event_id", "episode_end_date_revised"),
-          by = c("person_id", "event_id")
-        ) |>
-        dplyr::mutate(event_date = dplyr::coalesce(
-          .data$episode_end_date_revised, .data$event_date
-        )) |>
-        dplyr::select(!"episode_end_date_revised") |>
-        dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
-
-      firstOutcomeEvent <- firstOutcomeEvent |>
-        dplyr::left_join(
-          revisedOutcomeDates |>
-            dplyr::select("person_id", "event_id", "episode_end_date_revised"),
-          by = c("person_id", "event_id")
-        ) |>
-        dplyr::mutate(event_date = dplyr::coalesce(
-          .data$episode_end_date_revised, .data$event_date
-        )) |>
-        dplyr::select(!"episode_end_date_revised") |>
-        dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+      cdm[[nms$pregnancy_events]] <- updateEventDates(
+        x = cdm[[nms$pregnancy_events]],
+        revisions = revisedOutcomeDates,
+        name = nms$pregnancy_events
+      )
+      events <- updateEventDates(
+        x = events,
+        revisions = revisedOutcomeDates,
+        name = omopgenerics::uniqueTableName(prefix = prefix)
+      )
+      firstOutcomeEvent <- updateEventDates(
+        x = firstOutcomeEvent,
+        revisions = revisedOutcomeDates,
+        name = omopgenerics::uniqueTableName(prefix = prefix)
+      )
     }
 
-    firstOutcomeEventInv <- firstOutcomeEvent |>
-      dplyr::select("person_id", "event_id", "outcome_date" = "event_date") |>
-      dplyr::inner_join(
-        cdm[[nms$pregnancy_events]] |>
-          dplyr::filter(.data$category %in% c("AGP", "PCONF")) |>
-          dplyr::select("person_id", "event_date"),
-        by = "person_id"
-      ) |>
-      dplyr::mutate(days = clock::date_count_between(
-        start = .data$outcome_date,
-        end = .data$event_date,
-        precision = "day"
-      )) |>
-      dplyr::filter(.data$days > 0 & .data$days <= 42) |>
-      dplyr::distinct(.data$person_id, .data$event_id) |>
-      dplyr::compute(name = omopgenerics::uniqueTableName(prefix = prefix))
+    firstOutcomeEventInv <- getOutcomeInvalidationEvents(
+      events = cdm[[nms$pregnancy_events]],
+      firstOutcomeEvent = firstOutcomeEvent,
+      prefix = prefix
+    )
 
     invalidOutcomes <- getTemporalInvalidOutcomes(
       cdm = cdm, nms = nms, firstOutcomeEvent = firstOutcomeEvent, prefix = prefix

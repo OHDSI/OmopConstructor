@@ -3,6 +3,7 @@
 export(buildAchillesTables)
 export(buildDrugEra)
 export(buildObservationPeriod)
+export(buildPregnancyEpisodes)
 export(collapseRecords)
 importFrom(rlang,":=")
 importFrom(rlang,.data)

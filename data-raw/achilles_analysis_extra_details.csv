@@ -191,7 +191,7 @@ analysis_id,type,table,operation
 1200,count record,person,join care_site
 1201,count record,care_site,join visit_occurrence
 1202,count record,care_site,
-1203,count record,care_site,join visit_occurrence
+1203,count record,visit_occurrence,
 1300,count person_id,visit_detail,
 1301,count record,visit_detail,
 1302,count person_id,visit_detail,addDate start month

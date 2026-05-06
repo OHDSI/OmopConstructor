@@ -161,10 +161,12 @@ appendAchillesId <- function(cdm, id) {
   if (types[1] == "update") {
     res <- update(cdm = cdm)
   } else if (types[1] == "count") {
-    by <- groupBy(analysis = analysis)
+    by <- groupBy(analysis = analysis) |>
+      correctBy(cdmVersion = omopgenerics::cdmVersion(cdm))
     res <- counts(x = x, by = by, count = types[2])
   } else if (types[1] == "distribution") {
-    by <- groupBy(analysis = analysis)
+    by <- groupBy(analysis = analysis) |>
+      correctBy(cdmVersion = omopgenerics::cdmVersion(cdm))
     res <- distribution(x = x, by = by, value = types[[2]])
   } else if (types[1] == "proportion") {
     res <- proportion(x = x, count = types[2], den = den, by = by)
@@ -786,4 +788,10 @@ appendAchillesAnalysis <- function(cdm, achillesId) {
 
   # remove temp table
   omopgenerics::dropSourceTable(cdm = cdm, name = nm)
+}
+correctBy <- function(by, cdmVersion) {
+  if (cdmVersion == "5.4") {
+    by[by == "discharge_to_concept_id"] <- "discharged_to_concept_id"
+  }
+  by
 }

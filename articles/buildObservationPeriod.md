@@ -32,7 +32,7 @@ assigning a single observation period per person, starting from their
 first record in the database (e.g., first hospital visit) and ending at
 the earliest of: (1) the patient’s death date; (2) a censoring age
 (commonly 120 years, but this may vary depending on the data source); or
-(3) a censoring date (typically the data extraction date).[¹](#fn1)
+(3) a censoring date (typically the data extraction date).[^1]
 
 In this vignette, we will illustrate several approaches to defining the
 observation period:
@@ -91,6 +91,7 @@ purpose of this example we will use the (**GiBleed**) dataset available
 using [omock](https://ohdsi.github.io/omock/).
 
 ``` r
+
 library(omock)
 library(OmopConstructor)
 library(OmopSketch)
@@ -148,6 +149,7 @@ to `Inf` as we want to span the observation period till the extraction
 of data.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = Inf,
@@ -191,6 +193,7 @@ toward the end of observation you end up with a more sick population
 being in observation.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = Inf,
@@ -226,6 +229,7 @@ calculate incidence or prevalence, as it will result in an unreliable
 denominator.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = 0,
@@ -257,6 +261,7 @@ argument (`collapseDays = 180`) and set `persistenceDays` to `0` as we
 add any time after the records.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = 180,
@@ -287,6 +292,7 @@ to `179` as we want to add 179 days after any record. Note
 to back* observation periods are not allowed.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = 180,
@@ -314,6 +320,7 @@ In this case we will set arguments to `365` and `364` analogously to the
 previous definition.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = 365,
@@ -343,6 +350,7 @@ to simulate a database with pediatric data where we loose followup after
 the patient turns 18 as they are moved to other specialised cares.
 
 ``` r
+
 cdm <- buildObservationPeriod(
   cdm = cdm,
   collapseDays = Inf,
@@ -372,18 +380,21 @@ using the
 function.
 
 ``` r
+
 result <- bind(result1, result2, result3, result4, result5, result6, result7)
 ```
 
 If we compare the overall statistics of the observation period:
 
 ``` r
+
 tableObservationPeriod(result)
 ```
 
 [TABLE]
 
-Summary of observation_period table
+Summary of observation_period table {.table .gt_table
+quarto-disable-processing="false" quarto-bootstrap="false"}
 
 We can see that definitions (1), (2) and (7) lead to a one observation
 period per person by definition. The Collapse 180 (4) and
@@ -392,6 +403,7 @@ periods but with different durations. We can take a better look to this
 statistics looking at the plots:
 
 ``` r
+
 plotObservationPeriod(result = result, 
                       variableName = "Records per person",
                       plotType = "densityplot", 
@@ -413,6 +425,7 @@ plot more clear we will renomalise to a maximum of 1 so we can see the
 different densities side by side:
 
 ``` r
+
 result |>
   filterSettings(result_type == "summarise_observation_period") |>
   filter(
@@ -449,6 +462,7 @@ of the observation period definitions, note this would be the
 denominator of an incidence or prevalence study.
 
 ``` r
+
 result |>
   filter(variable_name == 'Number person-days') |>
   plotInObservation(colour = "cdm_name")
@@ -476,6 +490,7 @@ Finally, to show more in depth the findings we can see the evolution of
 the median age of the individuals in observation:
 
 ``` r
+
 result |>
   filter(variable_name == 'Median age in observation') |>
   plotInObservation(colour = "cdm_name")
@@ -512,6 +527,4 @@ periods on a study-by-study basis.
 > use the `writeSchema = cdmSchema` and have writing permissions in the
 > `cdmSchema`.
 
-------------------------------------------------------------------------
-
-1.  <https://heron-uk.github.io/heron-uk/data_conventions/observation_period.html>
+[^1]: <https://heron-uk.github.io/heron-uk/data_conventions/observation_period.html>

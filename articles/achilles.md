@@ -35,6 +35,7 @@ Here you can see how we run achilles analyses in the ‘GiBleed’ synthetic
 dataset:
 
 ``` r
+
 library(omock)
 library(OmopConstructor)
 
@@ -119,7 +120,7 @@ cdm
 
 cdm$achilles_results
 #> # Source:   table<results.test_achilles_results> [?? x 7]
-#> # Database: DuckDB 1.5.1 [unknown@Linux 6.17.0-1008-azure:R 4.5.3//tmp/RtmpNzQoH3/file1dc4619e1815.duckdb]
+#> # Database: DuckDB 1.5.2 [unknown@Linux 6.17.0-1010-azure:R 4.6.0//tmp/Rtmpq2ruFk/file1c6f67f9b45c.duckdb]
 #>    analysis_id stratum_1 stratum_2 stratum_3 stratum_4 stratum_5 count_value
 #>          <int> <chr>     <chr>     <chr>     <chr>     <chr>           <int>
 #>  1         200 9201      NA        NA        NA        NA                890

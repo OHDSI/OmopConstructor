@@ -21,6 +21,7 @@ era, among others.
 You can install OmopConstructor from cran using:
 
 ``` r
+
 install.packages("OmopConstructor")
 ```
 
@@ -28,6 +29,7 @@ Or, you can install the development version of OmopConstructor from
 [GitHub](https://github.com/) with:
 
 ``` r
+
 # install.packages("pak")
 pak::pkg_install("ohdsi/OmopConstructor")
 ```
@@ -51,6 +53,7 @@ earliest of the following: (1) a recorded death, (2) reaching 120 years
 of age, or (3) the extraction date (here, set to 01-01-2010).
 
 ``` r
+
 library(omock)
 library(OmopConstructor)
 
@@ -84,6 +87,7 @@ We can use *OmopSketch* to visualise the characteristics of the new
 observation period table that we have built:
 
 ``` r
+
 library(OmopSketch)
 
 result <- summariseObservationPeriod(observationPeriod = cdm$observation_period)

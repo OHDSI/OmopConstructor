@@ -101,7 +101,8 @@ buildObservationPeriod <- function(cdm,
     x <- x |>
       dplyr::left_join(
         cdm$death |>
-          dplyr::select("person_id", "death_date"),
+          dplyr::group_by(.data$persson_id) |>
+          dplyr::summarise(death_date = min(.data$death_date, na.rm = TRUE)),
         by = "person_id"
       ) |>
       dplyr::mutate(end_date = dplyr::case_when(
